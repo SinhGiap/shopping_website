@@ -171,10 +171,11 @@ class MLPredictor:
     
     def _prepare_ensemble_model(self):
         """Prepare ensemble prediction weights"""
-        # Based on Milestone I results, BoW performed best
+        # Adjust weights to give more importance to structured features
+        # which are more reliable for ratings and categorical data
         self.ensemble_weights = {
-            'bow': 0.7,
-            'title_struct': 0.3
+            'bow': 0.4,  # Reduced from 0.7 to 0.4
+            'title_struct': 0.6  # Increased from 0.3 to 0.6
         }
     
     def predict_recommendation(self, review_title, review_text, rating=5, 

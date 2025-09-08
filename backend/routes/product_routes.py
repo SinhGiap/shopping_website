@@ -9,9 +9,9 @@ product_bp = Blueprint('product', __name__)
 
 @product_bp.route('/product/<int:clothing_id>')
 def product_detail(clothing_id):
-    """Enhanced product detail page"""
+    """Enhanced product detail page with new review support"""
     try:
-        from backend.services.data_manager import get_dataframe
+        from backend.services.data_manager import get_dataframe, get_product_reviews, get_review_statistics
         
         df = get_dataframe()
         
@@ -27,21 +27,17 @@ def product_detail(clothing_id):
         
         product = product_rows.iloc[0]
         
-        # Get all reviews for this product
-        reviews = df[df['Clothing ID'] == clothing_id][
-            ['Title', 'Review Text', 'Rating', 'Recommended IND', 'Age']
-        ].to_dict('records')
+        # Get all reviews for this product (original + new)
+        reviews = get_product_reviews(clothing_id)
         
-        # Calculate statistics
-        ratings = df[df['Clothing ID'] == clothing_id]['Rating']
-        avg_rating = float(ratings.mean()) if not ratings.empty else 0
-        review_count = len(reviews)
+        # Calculate statistics including new reviews
+        stats = get_review_statistics(clothing_id)
         
         return render_template('product.html',
                              product=product.to_dict(),
                              reviews=reviews,
-                             avg_rating=round(avg_rating, 1),
-                             review_count=review_count)
+                             avg_rating=stats['avg_rating'],
+                             review_count=stats['review_count'])
         
     except Exception as e:
         print(f"Error in product detail route: {e}")
@@ -92,13 +88,20 @@ def submit_review():
             flash('Rating must be between 1 and 5', 'error')
             return redirect(url_for('product.add_review_form', clothing_id=clothing_id))
         
-        # In a real application, you would save this to a database
-        # For this demo, we'll show success message with prediction
+        # Save the new review
+        from backend.services.data_manager import add_new_review, get_dataframe, get_ml_predictor
+        
+        # Add the review to our storage
+        new_review = add_new_review(
+            clothing_id=clothing_id,
+            title=title,
+            review_text=review_text,
+            rating=rating,
+            recommended=recommended
+        )
         
         # Get ML prediction for the review
         try:
-            from backend.services.data_manager import get_dataframe, get_ml_predictor
-            
             df = get_dataframe()
             ml_predictor = get_ml_predictor()
             
@@ -115,12 +118,13 @@ def submit_review():
                     
                     pred_text = "recommend" if prediction['prediction'] == 1 else "not recommend"
                     confidence = prediction.get('confidence', 0.5)
-                    flash(f'Review submitted! Our AI predicts you would {pred_text} this product (confidence: {confidence:.1%})', 'success')
+                    flash(f'Review submitted successfully! Our AI predicts you would {pred_text} this product (confidence: {confidence:.1%})', 'success')
                 else:
                     flash('Review submitted successfully!', 'success')
             else:
                 flash('Review submitted successfully!', 'success')
-        except:
+        except Exception as pred_error:
+            print(f"Error in ML prediction: {pred_error}")
             flash('Review submitted successfully!', 'success')
         
         return redirect(url_for('product.product_detail', clothing_id=clothing_id))

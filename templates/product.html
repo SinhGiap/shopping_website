@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
             <li class="breadcrumb-item"><a href="{{ url_for('main.search') }}">Products</a></li>
             {% if product['Department Name'] %}
             <li class="breadcrumb-item">
@@ -78,7 +78,7 @@
                     <p class="text-muted mb-4">Share your experience and help other shoppers!</p>
                     
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('add_review_form', clothing_id=product['Clothing ID']) }}" 
+                        <a href="{{ url_for('product.add_review_form', clothing_id=product['Clothing ID']) }}" 
                            class="btn btn-primary btn-lg">
                             <i class="bi bi-pencil-square"></i> Write a Review
                         </a>
@@ -138,11 +138,18 @@
             <!-- Reviews List -->
             <div class="reviews-container">
                 {% for review in reviews[:10] %}
-                <div class="card border-0 shadow-sm mb-3">
+                <div class="card border-0 shadow-sm mb-3{% if review.get('Is New') %} border-primary{% endif %}">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <h6 class="card-title fw-bold mb-1">{{ review['Title'] or 'Review' }}</h6>
+                                <h6 class="card-title fw-bold mb-1">
+                                    {{ review['Title'] or 'Review' }}
+                                    {% if review.get('Is New') %}
+                                        <span class="badge bg-primary ms-2">
+                                            <i class="bi bi-star"></i> New Review
+                                        </span>
+                                    {% endif %}
+                                </h6>
                                 <div class="review-rating">
                                     {% for i in range(5) %}
                                         {% if i < review['Rating'] %}
@@ -166,9 +173,14 @@
                                         </span>
                                     {% endif %}
                                 </div>
-                                {% if review['Age'] %}
-                                    <small class="text-muted">Age {{ review['Age'] }}</small>
-                                {% endif %}
+                                <div class="small text-muted">
+                                    {% if review.get('Date Added') %}
+                                        <div>{{ review['Date Added'] }}</div>
+                                    {% endif %}
+                                    {% if review['Age'] %}
+                                        <div>Age {{ review['Age'] }}</div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         
@@ -206,7 +218,7 @@
         </div>
         <h4 class="fw-bold text-muted mb-3">No Reviews Yet</h4>
         <p class="text-muted mb-4">Be the first to share your experience with this product!</p>
-        <a href="{{ url_for('add_review_form', clothing_id=product['Clothing ID']) }}" 
+        <a href="{{ url_for('product.add_review_form', clothing_id=product['Clothing ID']) }}" 
            class="btn btn-primary btn-lg">
             <i class="bi bi-pencil-square"></i> Write the First Review
         </a>
