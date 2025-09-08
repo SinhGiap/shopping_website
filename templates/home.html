@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Enhanced Shopping Website{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient text-white py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="bi bi-stars"></i> Enhanced Shopping Experience
+                    </h1>
+                    <p class="lead mb-4">
+                        Discover amazing products with our ML-powered recommendation system. 
+                        Search, explore, and get intelligent predictions for your reviews!
+                    </p>
+                    
+                    <!-- Enhanced Search Form -->
+                    <form action="{{ url_for('search') }}" method="GET" class="mb-4">
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-white border-0">
+                                        <i class="bi bi-search text-muted"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-0 shadow-sm" 
+                                           name="q" placeholder="Search for clothing, dresses, shoes..." 
+                                           style="border-radius: 0 25px 25px 0;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold">
+                                    <i class="bi bi-search"></i> Search Now
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Quick Category Links -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('search', department='Dresses') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-person-dress"></i> Dresses
+                        </a>
+                        <a href="{{ url_for('search', department='Tops') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-shirt"></i> Tops
+                        </a>
+                        <a href="{{ url_for('search', department='Bottoms') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-shorts"></i> Bottoms
+                        </a>
+                        <a href="{{ url_for('search', class='Shoes') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-shoe"></i> Shoes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-illustration">
+                        <i class="bi bi-bag-heart display-1 text-warning"></i>
+                        <div class="mt-3">
+                            <div class="badge bg-warning text-dark fs-6 mb-2">
+                                <i class="bi bi-robot"></i> AI-Powered
+                            </div>
+                            <div class="badge bg-info fs-6 mb-2">
+                                <i class="bi bi-search-heart"></i> Smart Search
+                            </div>
+                            <div class="badge bg-success fs-6">
+                                <i class="bi bi-star-fill"></i> ML Predictions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col">
+                    <h2 class="display-6 fw-bold mb-3">
+                        <i class="bi bi-gear-fill text-primary"></i> Website Features
+                    </h2>
+                    <p class="lead text-muted">Experience the power of machine learning in online shopping</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-search-heart display-4 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Smart Search</h5>
+                            <p class="card-text text-muted">
+                                Advanced fuzzy search with intelligent matching. Find products even with 
+                                typos or partial matches.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-robot display-4 text-success"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">ML Predictions</h5>
+                            <p class="card-text text-muted">
+                                Get AI-powered predictions on whether you'll recommend a product 
+                                based on your review.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-phone display-4 text-warning"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Responsive Design</h5>
+                            <p class="card-text text-muted">
+                                Seamless experience across all devices with modern Bootstrap styling 
+                                and mobile optimization.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    {% if featured_items %}
+    <section class="featured-products py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2 class="display-6 fw-bold text-center mb-3">
+                        <i class="bi bi-star-fill text-warning"></i> Featured Products
+                    </h2>
+                    <p class="text-center text-muted">Top-rated products from our collection</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                {% for item in featured_items %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm product-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">{{ item['Class Name'] }}</span>
+                                <div class="rating">
+                                    {% for i in range(5) %}
+                                        {% if i < item['Rating'] %}
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <small class="text-muted ms-1">{{ "%.1f"|format(item['Rating']) }}</small>
+                                </div>
+                            </div>
+                            
+                            <h5 class="card-title fw-bold">{{ item['Clothes Title'] }}</h5>
+                            <p class="card-text text-muted">{{ item['Clothes Description'][:100] }}{% if item['Clothes Description']|length > 100 %}...{% endif %}</p>
+                            
+                            <div class="mt-auto">
+                                <small class="text-muted d-block mb-2">
+                                    <i class="bi bi-tag"></i> {{ item['Department Name'] }}
+                                </small>
+                                <a href="{{ url_for('product_detail', clothing_id=item['Clothing ID']) }}" 
+                                   class="btn btn-primary w-100">
+                                    <i class="bi bi-eye"></i> View Product
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('search') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-grid"></i> View All Products
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Categories Section -->
+    <section class="categories-section py-5 bg-light">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2 class="display-6 fw-bold text-center mb-3">
+                        <i class="bi bi-grid-3x3-gap text-info"></i> Shop by Category
+                    </h2>
+                    <p class="text-center text-muted">Browse our extensive collection</p>
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <!-- Divisions -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="bi bi-collection"></i> Collections</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for division in divisions[:5] %}
+                            <a href="{{ url_for('search', division=division) }}" 
+                               class="d-block text-decoration-none mb-2 category-link">
+                                <i class="bi bi-arrow-right text-primary"></i> {{ division }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Departments -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-shop"></i> Departments</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for department in departments[:5] %}
+                            <a href="{{ url_for('search', department=department) }}" 
+                               class="d-block text-decoration-none mb-2 category-link">
+                                <i class="bi bi-arrow-right text-success"></i> {{ department }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Classes -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="bi bi-tags"></i> Product Types</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for class_name in classes[:5] %}
+                            <a href="{{ url_for('search', class=class_name) }}" 
+                               class="d-block text-decoration-none mb-2 category-link">
+                                <i class="bi bi-arrow-right text-warning"></i> {{ class_name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5 bg-primary text-white">
+        <div class="container text-center">
+            <h2 class="display-6 fw-bold mb-3">Ready to Start Shopping?</h2>
+            <p class="lead mb-4">Experience the future of online shopping with AI-powered features</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="{{ url_for('search') }}" class="btn btn-warning btn-lg">
+                    <i class="bi bi-search"></i> Browse Products
+                </a>
+                <a href="{{ url_for('search', q='dress') }}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-heart"></i> Popular Items
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.product-card {
+    transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.category-link {
+    padding: 0.25rem 0;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+.category-link:hover {
+    background-color: rgba(0,0,0,0.05);
+    padding-left: 1rem;
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .hero-section .display-4 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}

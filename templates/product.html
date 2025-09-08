@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product['Clothes Title'] or product['Title'] }} - Product Details{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('search') }}">Products</a></li>
+            {% if product['Department Name'] %}
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('search', department=product['Department Name']) }}">{{ product['Department Name'] }}</a>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ product['Clothes Title'] or product['Title'] }}</li>
+        </ol>
+    </nav>
+
+    <!-- Product Header -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+                <div>
+                    <h1 class="fw-bold mb-2">{{ product['Clothes Title'] or product['Title'] or 'Product' }}</h1>
+                    <div class="product-badges mb-2">
+                        {% if product['Division Name'] %}
+                            <span class="badge bg-primary me-2">{{ product['Division Name'] }}</span>
+                        {% endif %}
+                        {% if product['Department Name'] %}
+                            <span class="badge bg-success me-2">{{ product['Department Name'] }}</span>
+                        {% endif %}
+                        {% if product['Class Name'] %}
+                            <span class="badge bg-warning text-dark">{{ product['Class Name'] }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="rating-display mb-2">
+                        {% if avg_rating > 0 %}
+                            <div class="d-flex align-items-center">
+                                {% for i in range(5) %}
+                                    {% if i < avg_rating %}
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-star text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="ms-2 fw-bold">{{ avg_rating }}</span>
+                            </div>
+                            <small class="text-muted">Based on {{ review_count }} review{{ 's' if review_count != 1 else '' }}</small>
+                        {% else %}
+                            <small class="text-muted">No ratings yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Description -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle text-primary"></i> Product Description
+                    </h5>
+                    <p class="card-text">{{ product['Clothes Description'] or 'No description available.' }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Action Card -->
+            <div class="card border-0 shadow-sm sticky-top">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-heart text-danger"></i> Love this product?
+                    </h5>
+                    <p class="text-muted mb-4">Share your experience and help other shoppers!</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('add_review_form', clothing_id=product['Clothing ID']) }}" 
+                           class="btn btn-primary btn-lg">
+                            <i class="bi bi-pencil-square"></i> Write a Review
+                        </a>
+                        
+                        <button type="button" class="btn btn-outline-secondary" onclick="shareProduct()">
+                            <i class="bi bi-share"></i> Share Product
+                        </button>
+                    </div>
+                    
+                    <!-- Product Stats -->
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="fw-bold text-primary">{{ review_count }}</div>
+                                <small class="text-muted">Reviews</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="fw-bold text-success">{{ "%.0f"|format((reviews|selectattr('Recommended IND', 'equalto', 1)|list|length / reviews|length * 100) if reviews else 0) }}%</div>
+                                <small class="text-muted">Recommend</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    {% if reviews %}
+    <div class="row">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">
+                    <i class="bi bi-chat-square-text text-primary"></i> Customer Reviews
+                    <span class="badge bg-secondary ms-2">{{ review_count }}</span>
+                </h3>
+                
+                <!-- Review Summary -->
+                <div class="text-end">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="me-2">Overall Rating:</span>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if i < avg_rating %}
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                {% else %}
+                                    <i class="bi bi-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="ms-2 fw-bold">{{ avg_rating }}</span>
+                    </div>
+                    <small class="text-muted">{{ review_count }} total review{{ 's' if review_count != 1 else '' }}</small>
+                </div>
+            </div>
+            
+            <!-- Reviews List -->
+            <div class="reviews-container">
+                {% for review in reviews[:10] %}
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title fw-bold mb-1">{{ review['Title'] or 'Review' }}</h6>
+                                <div class="review-rating">
+                                    {% for i in range(5) %}
+                                        {% if i < review['Rating'] %}
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 small text-muted">{{ review['Rating'] }}/5 stars</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center mb-1">
+                                    {% if review['Recommended IND'] == 1 %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Recommended
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-x-circle"></i> Not Recommended
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% if review['Age'] %}
+                                    <small class="text-muted">Age {{ review['Age'] }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <p class="card-text">{{ review['Review Text'] or 'No review text provided.' }}</p>
+                        
+                        <!-- Review Actions -->
+                        <div class="review-actions mt-3 pt-2 border-top">
+                            <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="likeReview(this)">
+                                <i class="bi bi-hand-thumbs-up"></i> Helpful
+                                <span class="count">0</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="reportReview(this)">
+                                <i class="bi bi-flag"></i> Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if reviews|length > 10 %}
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-outline-primary" onclick="loadMoreReviews()">
+                        <i class="bi bi-arrow-down-circle"></i> Load More Reviews
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- No Reviews Yet -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-chat-square-text display-1 text-muted"></i>
+        </div>
+        <h4 class="fw-bold text-muted mb-3">No Reviews Yet</h4>
+        <p class="text-muted mb-4">Be the first to share your experience with this product!</p>
+        <a href="{{ url_for('add_review_form', clothing_id=product['Clothing ID']) }}" 
+           class="btn btn-primary btn-lg">
+            <i class="bi bi-pencil-square"></i> Write the First Review
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Related Products -->
+    <div class="mt-5">
+        <h4 class="fw-bold mb-4">
+            <i class="bi bi-collection text-success"></i> You Might Also Like
+        </h4>
+        <div class="text-center py-4">
+            <a href="{{ url_for('search', department=product['Department Name']) }}" 
+               class="btn btn-outline-primary">
+                <i class="bi bi-grid"></i> Browse Similar Products
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function shareProduct() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ product["Clothes Title"] or product["Title"] }}',
+            text: 'Check out this product!',
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('Product link copied to clipboard!');
+        }).catch(function() {
+            // Further fallback: show share modal
+            showShareModal();
+        });
+    }
+}
+
+function showShareModal() {
+    // Simple share modal implementation
+    const url = window.location.href;
+    const title = '{{ product["Clothes Title"] or product["Title"] }}';
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Product URL:</label>
+                        <input type="text" class="form-control" value="${url}" readonly onclick="this.select()">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" 
+                           target="_blank" class="btn btn-primary">
+                            Share on Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" 
+                           target="_blank" class="btn btn-info text-white">
+                            Share on Twitter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    modal.addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(modal);
+    });
+}
+
+function likeReview(button) {
+    const countSpan = button.querySelector('.count');
+    let count = parseInt(countSpan.textContent);
+    count++;
+    countSpan.textContent = count;
+    
+    button.classList.remove('btn-outline-primary');
+    button.classList.add('btn-primary');
+    button.disabled = true;
+    
+    // Add visual feedback
+    button.innerHTML = '<i class="bi bi-check"></i> Helpful <span class="count">' + count + '</span>';
+}
+
+function reportReview(button) {
+    if (confirm('Are you sure you want to report this review?')) {
+        button.innerHTML = '<i class="bi bi-check"></i> Reported';
+        button.disabled = true;
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-warning');
+    }
+}
+
+function loadMoreReviews() {
+    // In a real application, this would make an AJAX call to load more reviews
+    alert('Loading more reviews... (Feature not implemented in demo)');
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.rating-display .bi-star-fill,
+.rating-display .bi-star {
+    font-size: 1.2rem;
+}
+
+.review-rating .bi-star-fill,
+.review-rating .bi-star {
+    font-size: 0.9rem;
+}
+
+.sticky-top {
+    top: 1rem;
+}
+
+.reviews-container .card {
+    transition: box-shadow 0.2s ease;
+}
+
+.reviews-container .card:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.review-actions .btn {
+    font-size: 0.875rem;
+}
+
+.product-badges .badge {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 992px) {
+    .sticky-top {
+        position: static !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .rating-display {
+        text-align: start !important;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-in-out;
+}
+</style>
+{% endblock %}

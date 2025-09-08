@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Enhanced Shopping Website{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Search Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                <div>
+                    <h2 class="fw-bold mb-2">
+                        <i class="bi bi-search text-primary"></i> Search Results
+                    </h2>
+                    {% if query %}
+                        <p class="text-muted mb-0">
+                            Showing results for: <strong>"{{ query }}"</strong>
+                        </p>
+                    {% endif %}
+                    {% if division or department or class_name %}
+                        <p class="text-muted mb-0">
+                            Filtered by: 
+                            {% if division %}<span class="badge bg-primary">{{ division }}</span>{% endif %}
+                            {% if department %}<span class="badge bg-success">{{ department }}</span>{% endif %}
+                            {% if class_name %}<span class="badge bg-warning text-dark">{{ class_name }}</span>{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="mt-3 mt-md-0">
+                    <span class="badge bg-info fs-6">
+                        <i class="bi bi-collection"></i> {{ total_results }} products found
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Search Form -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <form action="{{ url_for('search') }}" method="GET">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="search-query" class="form-label fw-bold">
+                            <i class="bi bi-search"></i> Search Products
+                        </label>
+                        <input type="text" class="form-control" id="search-query" name="q" 
+                               value="{{ query }}" placeholder="Enter product name, description, or category...">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="division-filter" class="form-label fw-bold">
+                            <i class="bi bi-collection"></i> Collection
+                        </label>
+                        <select class="form-select" id="division-filter" name="division">
+                            <option value="">All Collections</option>
+                            <option value="General" {% if division == 'General' %}selected{% endif %}>General</option>
+                            <option value="Petite" {% if division == 'Petite' %}selected{% endif %}>Petite</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="department-filter" class="form-label fw-bold">
+                            <i class="bi bi-shop"></i> Department
+                        </label>
+                        <select class="form-select" id="department-filter" name="department">
+                            <option value="">All Departments</option>
+                            <option value="Tops" {% if department == 'Tops' %}selected{% endif %}>Tops</option>
+                            <option value="Bottoms" {% if department == 'Bottoms' %}selected{% endif %}>Bottoms</option>
+                            <option value="Dresses" {% if department == 'Dresses' %}selected{% endif %}>Dresses</option>
+                            <option value="Jackets" {% if department == 'Jackets' %}selected{% endif %}>Jackets</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="class-filter" class="form-label fw-bold">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if error %}
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+    {% elif results %}
+        <div class="row g-4">
+            {% for product in results %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="card-body">
+                        <!-- Product Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-primary">{{ product['Class Name'] or 'Product' }}</span>
+                                <small class="text-muted d-block mt-1">
+                                    <i class="bi bi-tag"></i> {{ product['Department Name'] or 'General' }}
+                                </small>
+                            </div>
+                            <div class="rating text-end">
+                                {% if product['Rating'] %}
+                                    {% for i in range(5) %}
+                                        {% if i < product['Rating'] %}
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <small class="text-muted d-block">{{ "%.1f"|format(product['Rating']) }} stars</small>
+                                {% else %}
+                                    <small class="text-muted">No rating</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <h5 class="card-title fw-bold text-truncate">
+                            {{ product['Clothes Title'] or product['Title'] or 'Product' }}
+                        </h5>
+                        
+                        <p class="card-text text-muted">
+                            {{ (product['Clothes Description'] or 'No description available')[:120] }}
+                            {% if (product['Clothes Description'] or '')|length > 120 %}...{% endif %}
+                        </p>
+                        
+                        <!-- Product Meta -->
+                        <div class="product-meta mb-3">
+                            {% if product['Division Name'] %}
+                                <small class="text-muted">
+                                    <i class="bi bi-collection"></i> {{ product['Division Name'] }}
+                                </small>
+                            {% endif %}
+                            {% if product.get('Age') %}
+                                <small class="text-muted ms-2">
+                                    <i class="bi bi-person"></i> Age {{ product['Age'] }}
+                                </small>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Action Button -->
+                        <div class="mt-auto">
+                            <a href="{{ url_for('product_detail', clothing_id=product['Clothing ID']) }}" 
+                               class="btn btn-primary w-100">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <nav aria-label="Search results pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page -->
+                <li class="page-item {% if not has_prev %}disabled{% endif %}">
+                    {% if has_prev %}
+                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=page-1) }}">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </a>
+                    {% else %}
+                        <span class="page-link">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </span>
+                    {% endif %}
+                </li>
+                
+                <!-- Page Numbers -->
+                {% set start_page = [1, page - 2]|max %}
+                {% set end_page = [total_pages, page + 2]|min %}
+                
+                {% if start_page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=1) }}">1</a>
+                    </li>
+                    {% if start_page > 2 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endif %}
+                
+                {% for p in range(start_page, end_page + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=p) }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+                
+                {% if end_page < total_pages %}
+                    {% if end_page < total_pages - 1 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=total_pages) }}">{{ total_pages }}</a>
+                    </li>
+                {% endif %}
+                
+                <!-- Next Page -->
+                <li class="page-item {% if not has_next %}disabled{% endif %}">
+                    {% if has_next %}
+                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=page+1) }}">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="page-link">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </span>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- No Results -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-search display-1 text-muted"></i>
+            </div>
+            <h3 class="fw-bold text-muted mb-3">No Products Found</h3>
+            <p class="text-muted mb-4">
+                {% if query %}
+                    We couldn't find any products matching "{{ query }}".
+                {% else %}
+                    No products match your current filters.
+                {% endif %}
+            </p>
+            
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{{ url_for('search') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-clockwise"></i> Clear Filters
+                </a>
+                <a href="{{ url_for('home') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-house"></i> Back to Home
+                </a>
+            </div>
+            
+            <div class="mt-4">
+                <h5 class="text-muted mb-3">Try searching for:</h5>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ url_for('search', q='dress') }}" class="btn btn-outline-secondary btn-sm">Dresses</a>
+                    <a href="{{ url_for('search', q='shirt') }}" class="btn btn-outline-secondary btn-sm">Shirts</a>
+                    <a href="{{ url_for('search', q='pants') }}" class="btn btn-outline-secondary btn-sm">Pants</a>
+                    <a href="{{ url_for('search', q='jacket') }}" class="btn btn-outline-secondary btn-sm">Jackets</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.rating i {
+    font-size: 0.8rem;
+}
+
+.product-meta {
+    min-height: 1.5rem;
+}
+
+.page-link {
+    color: var(--bs-primary);
+}
+
+.page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .pagination {
+        font-size: 0.875rem;
+    }
+}
+</style>
+{% endblock %}
