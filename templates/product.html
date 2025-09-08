@@ -8,10 +8,10 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('search') }}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.search') }}">Products</a></li>
             {% if product['Department Name'] %}
             <li class="breadcrumb-item">
-                <a href="{{ url_for('search', department=product['Department Name']) }}">{{ product['Department Name'] }}</a>
+                <a href="{{ url_for('main.search', department=product['Department Name']) }}">{{ product['Department Name'] }}</a>
             </li>
             {% endif %}
             <li class="breadcrumb-item active">{{ product['Clothes Title'] or product['Title'] }}</li>
@@ -219,7 +219,7 @@
             <i class="bi bi-collection text-success"></i> You Might Also Like
         </h4>
         <div class="text-center py-4">
-            <a href="{{ url_for('search', department=product['Department Name']) }}" 
+            <a href="{{ url_for('main.search', department=product['Department Name']) }}" 
                class="btn btn-outline-primary">
                 <i class="bi bi-grid"></i> Browse Similar Products
             </a>

@@ -38,7 +38,7 @@
     <!-- Enhanced Search Form -->
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body">
-            <form action="{{ url_for('search') }}" method="GET">
+            <form action="{{ url_for('main.search') }}" method="GET">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="search-query" class="form-label fw-bold">
@@ -143,7 +143,7 @@
                         
                         <!-- Action Button -->
                         <div class="mt-auto">
-                            <a href="{{ url_for('product_detail', clothing_id=product['Clothing ID']) }}" 
+                            <a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}" 
                                class="btn btn-primary w-100">
                                 <i class="bi bi-eye"></i> View Details
                             </a>
@@ -161,7 +161,7 @@
                 <!-- Previous Page -->
                 <li class="page-item {% if not has_prev %}disabled{% endif %}">
                     {% if has_prev %}
-                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=page-1) }}">
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=page-1) }}">
                             <i class="bi bi-chevron-left"></i> Previous
                         </a>
                     {% else %}
@@ -177,7 +177,7 @@
                 
                 {% if start_page > 1 %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=1) }}">1</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=1) }}">1</a>
                     </li>
                     {% if start_page > 2 %}
                         <li class="page-item disabled">
@@ -188,7 +188,7 @@
                 
                 {% for p in range(start_page, end_page + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=p) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=p) }}">{{ p }}</a>
                     </li>
                 {% endfor %}
                 
@@ -199,14 +199,14 @@
                         </li>
                     {% endif %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=total_pages) }}">{{ total_pages }}</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=total_pages) }}">{{ total_pages }}</a>
                     </li>
                 {% endif %}
                 
                 <!-- Next Page -->
                 <li class="page-item {% if not has_next %}disabled{% endif %}">
                     {% if has_next %}
-                        <a class="page-link" href="{{ url_for('search', q=query, division=division, department=department, class=class_name, page=page+1) }}">
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=page+1) }}">
                             Next <i class="bi bi-chevron-right"></i>
                         </a>
                     {% else %}
@@ -235,7 +235,7 @@
             </p>
             
             <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <a href="{{ url_for('search') }}" class="btn btn-primary">
+                <a href="{{ url_for('main.search') }}" class="btn btn-primary">
                     <i class="bi bi-arrow-clockwise"></i> Clear Filters
                 </a>
                 <a href="{{ url_for('home') }}" class="btn btn-outline-primary">
@@ -246,10 +246,10 @@
             <div class="mt-4">
                 <h5 class="text-muted mb-3">Try searching for:</h5>
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                    <a href="{{ url_for('search', q='dress') }}" class="btn btn-outline-secondary btn-sm">Dresses</a>
-                    <a href="{{ url_for('search', q='shirt') }}" class="btn btn-outline-secondary btn-sm">Shirts</a>
-                    <a href="{{ url_for('search', q='pants') }}" class="btn btn-outline-secondary btn-sm">Pants</a>
-                    <a href="{{ url_for('search', q='jacket') }}" class="btn btn-outline-secondary btn-sm">Jackets</a>
+                    <a href="{{ url_for('main.search', q='dress') }}" class="btn btn-outline-secondary btn-sm">Dresses</a>
+                    <a href="{{ url_for('main.search', q='shirt') }}" class="btn btn-outline-secondary btn-sm">Shirts</a>
+                    <a href="{{ url_for('main.search', q='pants') }}" class="btn btn-outline-secondary btn-sm">Pants</a>
+                    <a href="{{ url_for('main.search', q='jacket') }}" class="btn btn-outline-secondary btn-sm">Jackets</a>
                 </div>
             </div>
         </div>

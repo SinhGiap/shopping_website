@@ -18,7 +18,7 @@
                     </p>
                     
                     <!-- Enhanced Search Form -->
-                    <form action="{{ url_for('search') }}" method="GET" class="mb-4">
+                    <form action="{{ url_for('main.search') }}" method="GET" class="mb-4">
                         <div class="row g-2">
                             <div class="col-md-8">
                                 <div class="input-group input-group-lg">
@@ -40,16 +40,16 @@
                     
                     <!-- Quick Category Links -->
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ url_for('search', department='Dresses') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', department='Dresses') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-person-dress"></i> Dresses
                         </a>
-                        <a href="{{ url_for('search', department='Tops') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', department='Tops') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-shirt"></i> Tops
                         </a>
-                        <a href="{{ url_for('search', department='Bottoms') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', department='Bottoms') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-shorts"></i> Bottoms
                         </a>
-                        <a href="{{ url_for('search', class='Shoes') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', class='Shoes') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-shoe"></i> Shoes
                         </a>
                     </div>
@@ -174,7 +174,7 @@
                                 <small class="text-muted d-block mb-2">
                                     <i class="bi bi-tag"></i> {{ item['Department Name'] }}
                                 </small>
-                                <a href="{{ url_for('product_detail', clothing_id=item['Clothing ID']) }}" 
+                                <a href="{{ url_for('product.product_detail', clothing_id=item['Clothing ID']) }}" 
                                    class="btn btn-primary w-100">
                                     <i class="bi bi-eye"></i> View Product
                                 </a>
@@ -186,7 +186,7 @@
             </div>
             
             <div class="text-center mt-4">
-                <a href="{{ url_for('search') }}" class="btn btn-outline-primary btn-lg">
+                <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-grid"></i> View All Products
                 </a>
             </div>
@@ -215,7 +215,7 @@
                         </div>
                         <div class="card-body">
                             {% for division in divisions[:5] %}
-                            <a href="{{ url_for('search', division=division) }}" 
+                            <a href="{{ url_for('main.search', division=division) }}" 
                                class="d-block text-decoration-none mb-2 category-link">
                                 <i class="bi bi-arrow-right text-primary"></i> {{ division }}
                             </a>
@@ -232,7 +232,7 @@
                         </div>
                         <div class="card-body">
                             {% for department in departments[:5] %}
-                            <a href="{{ url_for('search', department=department) }}" 
+                            <a href="{{ url_for('main.search', department=department) }}" 
                                class="d-block text-decoration-none mb-2 category-link">
                                 <i class="bi bi-arrow-right text-success"></i> {{ department }}
                             </a>
@@ -249,7 +249,7 @@
                         </div>
                         <div class="card-body">
                             {% for class_name in classes[:5] %}
-                            <a href="{{ url_for('search', class=class_name) }}" 
+                            <a href="{{ url_for('main.search', class=class_name) }}" 
                                class="d-block text-decoration-none mb-2 category-link">
                                 <i class="bi bi-arrow-right text-warning"></i> {{ class_name }}
                             </a>
@@ -267,10 +267,10 @@
             <h2 class="display-6 fw-bold mb-3">Ready to Start Shopping?</h2>
             <p class="lead mb-4">Experience the future of online shopping with AI-powered features</p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="{{ url_for('search') }}" class="btn btn-warning btn-lg">
+                <a href="{{ url_for('main.search') }}" class="btn btn-warning btn-lg">
                     <i class="bi bi-search"></i> Browse Products
                 </a>
-                <a href="{{ url_for('search', q='dress') }}" class="btn btn-outline-light btn-lg">
+                <a href="{{ url_for('main.search', q='dress') }}" class="btn btn-outline-light btn-lg">
                     <i class="bi bi-heart"></i> Popular Items
                 </a>
             </div>

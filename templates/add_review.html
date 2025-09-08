@@ -7,8 +7,8 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('product_detail', clothing_id=product['Clothing ID']) }}">{{ product['Clothes Title'] or product['Title'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}">{{ product['Clothes Title'] or product['Title'] }}</a></li>
             <li class="breadcrumb-item active">Write Review</li>
         </ol>
     </nav>
@@ -46,7 +46,7 @@
                     <small>Share your experience to help other shoppers</small>
                 </div>
                 <div class="card-body">
-                    <form id="reviewForm" action="{{ url_for('submit_review') }}" method="POST">
+                    <form id="reviewForm" action="{{ url_for('product.submit_review') }}" method="POST">
                         <input type="hidden" name="clothing_id" value="{{ product['Clothing ID'] }}">
                         
                         <!-- Review Title -->
@@ -129,7 +129,7 @@
 
                         <!-- Submit Button -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ url_for('product_detail', clothing_id=product['Clothing ID']) }}" 
+                            <a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="bi bi-arrow-left"></i> Cancel
                             </a>
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         getPredictionBtn.disabled = true;
         
         // Make prediction request
-        fetch('{{ url_for("predict_recommendation") }}', {
+        fetch('{{ url_for("api.predict_recommendation") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

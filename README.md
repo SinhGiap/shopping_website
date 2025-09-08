@@ -27,7 +27,7 @@ A comprehensive Flask-based online shopping website with machine learning-powere
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.8+ (recommend 3.9)
 - pip package manager
 
 ### Installation
