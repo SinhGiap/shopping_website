@@ -21,6 +21,7 @@ def product_detail(clothing_id):
         
         # Get product details
         product_rows = df[df['Clothing ID'] == clothing_id]
+        
         if product_rows.empty:
             flash('Product not found', 'error')
             return redirect(url_for('main.home'))

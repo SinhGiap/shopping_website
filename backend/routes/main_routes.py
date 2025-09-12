@@ -52,6 +52,7 @@ def search():
     division = request.args.get('division', '').strip()
     department = request.args.get('department', '').strip()
     class_name = request.args.get('class', '').strip()
+    sort = request.args.get('sort', 'relevance').strip() or 'relevance'
     page = int(request.args.get('page', 1))
     per_page = Config.SEARCH_PER_PAGE
     
@@ -72,7 +73,20 @@ def search():
         else:
             results = search_engine.filter_by_category(division, department, class_name, limit=1000)
         
-        # Handle empty results
+        # Apply sorting before pagination
+        if not results.empty:
+            try:
+                if sort == 'rating' and 'Rating' in results.columns:
+                    results = results.sort_values('Rating', ascending=False)
+                elif sort == 'newest' and 'Clothing ID' in results.columns:
+                    # Proxy for newest, since product records have no timestamp
+                    results = results.sort_values('Clothing ID', ascending=False)
+                # 'relevance' keeps incoming order from search engine
+            except Exception as _sort_err:
+                # Keep original order on sort failure
+                pass
+
+        # Handle empty results after sorting
         if results.empty:
             return render_template('search.html',
                                  results=[], query=query, total_results=0,
@@ -100,7 +114,8 @@ def search():
                              has_next=has_next,
                              division=division,
                              department=department,
-                             class_name=class_name)
+                             class_name=class_name,
+                             sort=sort)
         
     except Exception as e:
         print(f"Error in search route: {e}")
@@ -108,6 +123,51 @@ def search():
                              results=[], query=query, total_results=0,
                              page=1, total_pages=0, has_prev=False, has_next=False,
                              error=f"Search error: {str(e)}")
+
+@main_bp.route('/admin')
+def admin_dashboard():
+    """Admin dashboard for managing reviews and system stats"""
+    try:
+        from backend.services.data_manager import get_dataframe, get_ml_predictor, get_search_engine
+        
+        df = get_dataframe()
+        ml_predictor = get_ml_predictor()
+        search_engine = get_search_engine()
+        
+        # Get system statistics
+        stats = {
+            'total_products': df['Clothing ID'].nunique() if df is not None and not df.empty else 0,
+            'total_reviews': len(df) if df is not None and not df.empty else 0,
+            'avg_rating': df['Rating'].mean() if df is not None and not df.empty else 0,
+            'recommendation_rate': (df['Recommended IND'] == 1).mean() * 100 if df is not None and not df.empty else 0,
+            'ml_loaded': ml_predictor.is_loaded if ml_predictor else False,
+            'search_available': search_engine is not None and not search_engine.df.empty
+        }
+        
+        # Get category distribution
+        categories = {
+            'divisions': df['Division Name'].value_counts().to_dict() if df is not None and not df.empty else {},
+            'departments': df['Department Name'].value_counts().to_dict() if df is not None and not df.empty else {},
+            'classes': df['Class Name'].value_counts().to_dict() if df is not None and not df.empty else {}
+        }
+        
+        # Get recent reviews (last 20)
+        recent_reviews = []
+        if df is not None and not df.empty:
+            recent_reviews = df.nlargest(20, 'Clothing ID')[['Clothing ID', 'Title', 'Review Text', 'Rating', 'Recommended IND']].to_dict('records')
+        
+        return render_template('admin_dashboard.html', 
+                             stats=stats, 
+                             categories=categories,
+                             recent_reviews=recent_reviews)
+        
+    except Exception as e:
+        print(f"Error in admin dashboard: {e}")
+        return render_template('admin_dashboard.html', 
+                             stats={}, 
+                             categories={},
+                             recent_reviews=[],
+                             error=str(e))
 
 @main_bp.route('/health')
 def health_check():

@@ -103,6 +103,56 @@ def get_categories():
             'error': str(e)
         })
 
+@api_bp.route('/stats')
+def get_stats():
+    """API endpoint to get website statistics"""
+    try:
+        from backend.services.data_manager import get_dataframe
+        
+        df = get_dataframe()
+        
+        if df is not None and not df.empty:
+            # Calculate unique products
+            unique_products = df['Clothing ID'].nunique()
+            
+            # Calculate average rating
+            avg_rating = df['Rating'].mean()
+            
+            # Calculate total reviews
+            total_reviews = len(df)
+            
+            # Calculate recommendation rate
+            recommendation_rate = (df['Recommended IND'] == 1).mean()
+            
+            stats = {
+                'totalProducts': int(unique_products),
+                'avgRating': round(float(avg_rating), 2),
+                'totalReviews': int(total_reviews),
+                'recommendationRate': round(float(recommendation_rate * 100), 1),
+                'status': 'success'
+            }
+        else:
+            # Fallback stats
+            stats = {
+                'totalProducts': 500,
+                'avgRating': 4.2,
+                'totalReviews': 1000,
+                'recommendationRate': 85.0,
+                'status': 'fallback'
+            }
+        
+        return jsonify(stats)
+    except Exception as e:
+        print(f"Error getting stats: {e}")
+        return jsonify({
+            'totalProducts': 500,
+            'avgRating': 4.2,
+            'totalReviews': 1000,
+            'recommendationRate': 85.0,
+            'error': str(e),
+            'status': 'error'
+        })
+
 # Legacy route for backward compatibility
 @api_bp.route('/predict_recommendation', methods=['POST'])
 def predict_recommendation_legacy():

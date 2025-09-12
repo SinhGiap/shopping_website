@@ -31,7 +31,7 @@ class Config:
     
     # Search settings
     SEARCH_PER_PAGE = 12
-    FEATURED_ITEMS_LIMIT = 6
+    FEATURED_ITEMS_LIMIT = 50  # Increased from 6 to 50 for more featured products
     SEARCH_LIMIT = 1000
     MIN_SEARCH_SCORE = 5
     

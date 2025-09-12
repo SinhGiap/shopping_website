@@ -59,17 +59,17 @@ class MLPredictor:
     
     def _clean_dataset(self, df):
         """Clean and validate the dataset"""
-        # Fill missing values
-        df['Review Text'] = df['Review Text'].fillna('')
-        df['Title'] = df['Title'].fillna('')
-        df['Clothes Title'] = df['Clothes Title'].fillna('Product')
-        df['Clothes Description'] = df['Clothes Description'].fillna('Description not available')
-        df['Rating'] = df['Rating'].fillna(df['Rating'].median())
-        df['Recommended IND'] = df['Recommended IND'].fillna(1)
+        # Fill missing values using proper pandas indexing
+        df.loc[:, 'Review Text'] = df['Review Text'].fillna('')
+        df.loc[:, 'Title'] = df['Title'].fillna('')
+        df.loc[:, 'Clothes Title'] = df['Clothes Title'].fillna('Product')
+        df.loc[:, 'Clothes Description'] = df['Clothes Description'].fillna('Description not available')
+        df.loc[:, 'Rating'] = df['Rating'].fillna(df['Rating'].median())
+        df.loc[:, 'Recommended IND'] = df['Recommended IND'].fillna(1)
         
         # Fill categorical columns
         for col in ['Division Name', 'Department Name', 'Class Name']:
-            df[col] = df[col].fillna('General')
+            df.loc[:, col] = df[col].fillna('General')
         
         return df
     

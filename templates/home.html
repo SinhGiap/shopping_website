@@ -9,23 +9,23 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">
-                        <i class="bi bi-stars"></i> Enhanced Shopping Experience
+                    <h1 class="display-4 fw-bold mb-4 fade-in">
+                        <i class="bi bi-stars floating"></i> Enhanced Shopping Experience
                     </h1>
-                    <p class="lead mb-4">
+                    <p class="lead mb-4 slide-up">
                         Discover amazing products with our ML-powered recommendation system. 
                         Search, explore, and get intelligent predictions for your reviews!
                     </p>
                     
                     <!-- Enhanced Search Form -->
-                    <form action="{{ url_for('main.search') }}" method="GET" class="mb-4">
+                    <form action="{{ url_for('main.search') }}" method="GET" class="mb-4 scale-in">
                         <div class="row g-2">
                             <div class="col-md-8">
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white border-0">
-                                        <i class="bi bi-search text-muted"></i>
+                                <div class="input-group input-group-lg glass-card">
+                                    <span class="input-group-text bg-transparent border-0">
+                                        <i class="bi bi-search text-white"></i>
                                     </span>
-                                    <input type="text" class="form-control border-0 shadow-sm" 
+                                    <input type="text" class="form-control bg-transparent border-0 text-white" 
                                            name="q" placeholder="Search for clothing, dresses, shoes..." 
                                            style="border-radius: 0 25px 25px 0;">
                                 </div>
@@ -39,32 +39,54 @@
                     </form>
                     
                     <!-- Quick Category Links -->
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ url_for('main.search', department='Dresses') }}" class="btn btn-outline-light btn-sm">
+                    <div class="d-flex flex-wrap gap-2 mb-4 slide-up">
+                        <a href="{{ url_for('main.search', department='Dresses') }}" class="btn glass-button btn-sm text-light">
                             <i class="bi bi-person-dress"></i> Dresses
                         </a>
-                        <a href="{{ url_for('main.search', department='Tops') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', department='Tops') }}" class="btn glass-button btn-sm text-light">
                             <i class="bi bi-shirt"></i> Tops
                         </a>
-                        <a href="{{ url_for('main.search', department='Bottoms') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.search', department='Bottoms') }}" class="btn glass-button btn-sm text-light">
                             <i class="bi bi-shorts"></i> Bottoms
                         </a>
-                        <a href="{{ url_for('main.search', class='Shoes') }}" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-shoe"></i> Shoes
+                        <a href="{{ url_for('main.search', department='Jackets') }}" class="btn glass-button btn-sm text-light">
+                            <i class="bi bi-jacket"></i> Jackets
                         </a>
+                    </div>
+                    
+                    <!-- Stats Section -->
+                    <div class="row g-3 mb-4 scale-in">
+                        <div class="col-4">
+                            <div class="text-center glass-card p-3">
+                                <div class="h4 mb-0 gradient-text" id="totalProducts">-</div>
+                                <small class="text-light">Products</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center glass-card p-3">
+                                <div class="h4 mb-0 gradient-text-secondary" id="avgRating">-</div>
+                                <small class="text-light">Avg Rating</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center glass-card p-3">
+                                <div class="h4 mb-0 gradient-text" id="totalReviews">-</div>
+                                <small class="text-light">Reviews</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
-                    <div class="hero-illustration">
-                        <i class="bi bi-bag-heart display-1 text-warning"></i>
+                    <div class="hero-illustration floating">
+                        <i class="bi bi-bag-heart display-1 text-black"></i>
                         <div class="mt-3">
-                            <div class="badge bg-warning text-dark fs-6 mb-2">
+                            <div class="modern-badge fs-6 mb-2">
                                 <i class="bi bi-robot"></i> AI-Powered
                             </div>
-                            <div class="badge bg-info fs-6 mb-2">
+                            <div class="modern-badge fs-6 mb-2" style="background: var(--info-gradient);">
                                 <i class="bi bi-search-heart"></i> Smart Search
                             </div>
-                            <div class="badge bg-success fs-6">
+                            <div class="modern-badge fs-6" style="background: var(--success-gradient);">
                                 <i class="bi bi-star-fill"></i> ML Predictions
                             </div>
                         </div>
@@ -79,8 +101,8 @@
         <div class="container">
             <div class="row text-center mb-5">
                 <div class="col">
-                    <h2 class="display-6 fw-bold mb-3">
-                        <i class="bi bi-gear-fill text-primary"></i> Website Features
+                    <h2 class="display-6 fw-bold mb-3 text-dark">
+                        Website Features
                     </h2>
                     <p class="lead text-muted">Experience the power of machine learning in online shopping</p>
                 </div>
@@ -91,10 +113,10 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon mb-3">
-                                <i class="bi bi-search-heart display-4 text-primary"></i>
+                                <i class="bi bi-search display-4 text-black"></i>
                             </div>
-                            <h5 class="card-title fw-bold">Smart Search</h5>
-                            <p class="card-text text-muted">
+                            <h5 class="card-title fw-bold text-dark">Smart Search</h5>
+                            <p class="card-text text-dark">
                                 Advanced fuzzy search with intelligent matching. Find products even with 
                                 typos or partial matches.
                             </p>
@@ -106,10 +128,10 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon mb-3">
-                                <i class="bi bi-robot display-4 text-success"></i>
+                                <i class="bi bi-robot display-4 text-black"></i>
                             </div>
-                            <h5 class="card-title fw-bold">ML Predictions</h5>
-                            <p class="card-text text-muted">
+                            <h5 class="card-title fw-bold text-dark">ML Predictions</h5>
+                            <p class="card-text text-dark">
                                 Get AI-powered predictions on whether you'll recommend a product 
                                 based on your review.
                             </p>
@@ -121,10 +143,10 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon mb-3">
-                                <i class="bi bi-phone display-4 text-warning"></i>
+                                <i class="bi bi-phone display-4 text-black"></i>
                             </div>
-                            <h5 class="card-title fw-bold">Responsive Design</h5>
-                            <p class="card-text text-muted">
+                            <h5 class="card-title fw-bold text-dark">Responsive Design</h5>
+                            <p class="card-text text-dark">
                                 Seamless experience across all devices with modern Bootstrap styling 
                                 and mobile optimization.
                             </p>
@@ -135,57 +157,69 @@
         </div>
     </section>
 
-    <!-- Featured Products Section -->
+    <!-- Featured Products Section (Horizontal carousels by product type) -->
     {% if featured_items %}
-    <section class="featured-products py-5">
-        <div class="container">
-            <div class="row mb-4">
+    <section class="featured-products py-5 bg-white">
+        <div class="container text-dark">
+            <div class="row mb-3">
                 <div class="col">
-                    <h2 class="display-6 fw-bold text-center mb-3">
-                        <i class="bi bi-star-fill text-warning"></i> Featured Products
+                    <h2 class="display-6 fw-bold mb-0 text-dark">
+                     Featured Products
                     </h2>
-                    <p class="text-center text-muted">Top-rated products from our collection</p>
+                    <p class="text-muted mt-1">Top-rated picks by category</p>
                 </div>
             </div>
-            
-            <div class="row g-4">
-                {% for item in featured_items %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 border-0 shadow-sm product-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="badge bg-primary">{{ item['Class Name'] }}</span>
-                                <div class="rating">
-                                    {% for i in range(5) %}
-                                        {% if i < item['Rating'] %}
-                                            <i class="bi bi-star-fill text-warning"></i>
-                                        {% else %}
-                                            <i class="bi bi-star text-muted"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <small class="text-muted ms-1">{{ "%.1f"|format(item['Rating']) }}</small>
-                                </div>
-                            </div>
-                            
-                            <h5 class="card-title fw-bold">{{ item['Clothes Title'] }}</h5>
-                            <p class="card-text text-muted">{{ item['Clothes Description'][:100] }}{% if item['Clothes Description']|length > 100 %}...{% endif %}</p>
-                            
-                            <div class="mt-auto">
-                                <small class="text-muted d-block mb-2">
-                                    <i class="bi bi-tag"></i> {{ item['Department Name'] }}
-                                </small>
-                                <a href="{{ url_for('product.product_detail', clothing_id=item['Clothing ID']) }}" 
-                                   class="btn btn-primary w-100">
-                                    <i class="bi bi-eye"></i> View Product
-                                </a>
-                            </div>
-                        </div>
+
+            {% for group in featured_items|groupby('Class Name') %}
+            <div class="featured-row mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-dark">{{ group.grouper }}</h5>
+                    <div class="d-flex align-items-center gap-1">
+                        <button class="btn btn-outline-secondary btn-sm carousel-prev" data-target="viewport-{{ loop.index0 }}" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm carousel-next" data-target="viewport-{{ loop.index0 }}" aria-label="Next">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
-                {% endfor %}
+                <div id="viewport-{{ loop.index0 }}" class="carousel-viewport">
+                    <div class="carousel-track">
+                        {% for item in group.list %}
+                        <div class="card border border-black shadow-sm product-card product-card--carousel my-2">
+                            <div class="card-body d-flex flex-column bg-white text-black">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span class="badge bg-black text-white">{{ item['Class Name']|upper }}</span>
+                                    <div class="rating text-nowrap">
+                                        {% for i in range(5) %}
+                                            {% if i < item['Rating'] %}
+                                                <i class="bi bi-star-fill text-black"></i>
+                                            {% else %}
+                                                <i class="bi bi-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <small class="text-muted ms-1">{{ "%.1f"|format(item['Rating']) }}</small>
+                                    </div>
+                                </div>
+                                <h6 class="card-title fw-bold text-black" title="{{ item['Clothes Title'] }}">{{ item['Clothes Title'] }}</h6>
+                                <p class="card-text text-muted small mb-3">{{ item['Clothes Description'][:100] }}{% if item['Clothes Description']|length > 100 %}...{% endif %}</p>
+                                <div class="mt-auto">
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="bi bi-tag text-black"></i> {{ item['Department Name']|upper }}
+                                    </small>
+                                    <a href="{{ url_for('product.product_detail', clothing_id=item['Clothing ID']) }}" class="btn btn-outline-dark w-100">
+                                        <i class="bi bi-eye"></i> VIEW PRODUCT
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            
-            <div class="text-center mt-4">
+            {% endfor %}
+
+            <div class="text-center mt-3">
                 <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-grid"></i> View All Products
                 </a>
@@ -199,8 +233,8 @@
         <div class="container">
             <div class="row mb-4">
                 <div class="col">
-                    <h2 class="display-6 fw-bold text-center mb-3">
-                        <i class="bi bi-grid-3x3-gap text-info"></i> Shop by Category
+                    <h2 class="display-6 fw-bold text-center mb-3 text-dark">
+                     Shop by Category
                     </h2>
                     <p class="text-center text-muted">Browse our extensive collection</p>
                 </div>
@@ -211,13 +245,13 @@
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-primary text-white">
-                            <h6 class="mb-0"><i class="bi bi-collection"></i> Collections</h6>
+                            <h6 class="mb-0 text-white"><i class="bi bi-collection"></i> Collections</h6>
                         </div>
                         <div class="card-body">
                             {% for division in divisions[:5] %}
                             <a href="{{ url_for('main.search', division=division) }}" 
                                class="d-block text-decoration-none mb-2 category-link">
-                                <i class="bi bi-arrow-right text-primary"></i> {{ division }}
+                                <i class="bi bi-arrow-right text-black"></i> {{ division }}
                             </a>
                             {% endfor %}
                         </div>
@@ -228,7 +262,7 @@
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-success text-white">
-                            <h6 class="mb-0"><i class="bi bi-shop"></i> Departments</h6>
+                            <h6 class="mb-0 text-white"><i class="bi bi-shop"></i> Departments</h6>
                         </div>
                         <div class="card-body">
                             {% for department in departments[:5] %}
@@ -245,7 +279,7 @@
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-warning text-dark">
-                            <h6 class="mb-0"><i class="bi bi-tags"></i> Product Types</h6>
+                            <h6 class="mb-0 text-white"><i class="bi bi-tags"></i> Product Types</h6>
                         </div>
                         <div class="card-body">
                             {% for class_name in classes[:5] %}
@@ -262,7 +296,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section py-5 bg-primary text-white">
+    <section class="cta-section py-5 text-dark bg-light">
         <div class="container text-center">
             <h2 class="display-6 fw-bold mb-3">Ready to Start Shopping?</h2>
             <p class="lead mb-4">Experience the future of online shopping with AI-powered features</p>
@@ -270,7 +304,7 @@
                 <a href="{{ url_for('main.search') }}" class="btn btn-warning btn-lg">
                     <i class="bi bi-search"></i> Browse Products
                 </a>
-                <a href="{{ url_for('main.search', q='dress') }}" class="btn btn-outline-light btn-lg">
+                <a href="{{ url_for('main.search', q='dress') }}" class="btn btn-outline-light btn-lg text-dark">
                     <i class="bi bi-heart"></i> Popular Items
                 </a>
             </div>
@@ -279,39 +313,587 @@
 </div>
 {% endblock %}
 
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load stats from API
+    loadStats();
+    
+    // Show fallback stats immediately in case API fails
+    setTimeout(() => {
+        const spinners = document.querySelectorAll('[id^="spinner-"]');
+        const icons = document.querySelectorAll('[id^="icon-"]');
+        
+        // Check if spinners are still showing (API might have failed)
+        if (spinners.length > 0 && spinners[0].style.display !== 'none') {
+            console.log('API seems to be slow, showing fallback stats');
+            
+            // Hide spinners and show icons
+            for (let i = 1; i <= 4; i++) {
+                const spinner = document.getElementById(`spinner-${i}`);
+                const icon = document.getElementById(`icon-${i}`);
+                if (spinner) spinner.style.display = 'none';
+                if (icon) icon.style.display = 'block';
+            }
+            
+            // Show fallback values
+            animateNumber('totalProducts', 500, 0);
+            animateNumber('avgRating', 4.2, 1);
+            animateNumber('totalReviews', 1000, 0);
+            animateNumber('recommendationRate', 85.0, 1);
+        }
+    }, 3000); // Wait 3 seconds before showing fallback
+    
+    // Add animations to featured products
+    const featuredCards = document.querySelectorAll('.featured-products .product-card');
+    featuredCards.forEach((card, index) => {
+        card.style.animationDelay = (index * 0.1) + 's';
+        card.classList.add('fade-in');
+    });
+    
+    // Add hover effects to category links
+    const categoryLinks = document.querySelectorAll('.category-link');
+    categoryLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+        });
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+    
+    // Add click tracking for analytics (placeholder)
+    const actionButtons = document.querySelectorAll('a[href*="search"], a[href*="product"]');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Could track user interactions here
+            console.log('User clicked:', this.textContent.trim());
+        });
+    });
+
+    // Initialize horizontal carousels
+    initCarousels();
+});
+
+function loadStats() {
+    console.log('Loading stats from API...');
+    
+    // Fetch stats from API endpoint
+    fetch('/api/stats')
+        .then(response => {
+            console.log('API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API data received:', data);
+            
+            // Hide spinners and show icons
+            for (let i = 1; i <= 4; i++) {
+                const spinner = document.getElementById(`spinner-${i}`);
+                const icon = document.getElementById(`icon-${i}`);
+                if (spinner) spinner.style.display = 'none';
+                if (icon) icon.style.display = 'block';
+            }
+            
+            // Update stats with animation
+            if (data.totalProducts) {
+                animateNumber('totalProducts', data.totalProducts, 0);
+            }
+            if (data.avgRating) {
+                animateNumber('avgRating', data.avgRating, 1);
+            }
+            if (data.totalReviews) {
+                animateNumber('totalReviews', data.totalReviews, 0);
+            }
+            if (data.recommendationRate) {
+                animateNumber('recommendationRate', data.recommendationRate, 1);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+            console.log('Using fallback values');
+            
+            // Hide spinners and show icons
+            for (let i = 1; i <= 4; i++) {
+                const spinner = document.getElementById(`spinner-${i}`);
+                const icon = document.getElementById(`icon-${i}`);
+                if (spinner) spinner.style.display = 'none';
+                if (icon) icon.style.display = 'block';
+            }
+            
+            // Fallback values with animation
+            animateNumber('totalProducts', 500, 0);
+            animateNumber('avgRating', 4.2, 1);
+            animateNumber('totalReviews', 1000, 0);
+            animateNumber('recommendationRate', 85.0, 1);
+        });
+}
+
+function animateNumber(elementId, targetValue, decimals) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const startValue = 0;
+    const duration = 2000; // 2 seconds
+    const startTime = performance.now();
+    
+    function updateNumber(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = startValue + (targetValue - startValue) * easeOutQuart;
+        
+        if (decimals === 0) {
+            element.textContent = Math.floor(currentValue).toLocaleString();
+        } else {
+            element.textContent = currentValue.toFixed(decimals);
+        }
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateNumber);
+        } else {
+            // Add suffix for recommendation rate
+            if (elementId === 'recommendationRate') {
+                element.textContent += '%';
+            }
+        }
+    }
+    
+    requestAnimationFrame(updateNumber);
+}
+
+// Simple horizontal carousel behavior
+function initCarousels() {
+    const VIEWPORT_CLASS = 'carousel-viewport';
+    const TRACK_CLASS = 'carousel-track';
+    const CARD_SELECTOR = '.product-card--carousel';
+    
+    // Track current position for each carousel
+    const carouselPositions = new Map();
+
+    function slideCards(viewport, direction = 1) {
+        const track = viewport.querySelector('.' + TRACK_CLASS);
+        if (!track) return;
+        
+        const viewportId = viewport.id;
+        const currentPos = carouselPositions.get(viewportId) || 0;
+        const cards = track.querySelectorAll(CARD_SELECTOR);
+        
+        if (cards.length === 0) return;
+        
+        // Calculate how many cards fit in viewport (approximately 3)
+        const cardWidth = 280 + 16; // card width + gap
+        const cardsPerView = Math.floor(viewport.clientWidth / cardWidth);
+        const maxPos = Math.max(0, cards.length - cardsPerView);
+        
+        let newPos = currentPos + direction;
+        newPos = Math.max(0, Math.min(newPos, maxPos));
+        
+        if (newPos !== currentPos) {
+            carouselPositions.set(viewportId, newPos);
+            
+            // Apply transform to slide cards by card width
+            const translateX = -newPos * cardWidth;
+            track.style.transform = `translateX(${translateX}px)`;
+            
+            // Update button states
+            updateButtonStates(viewport, newPos, maxPos);
+        }
+    }
+
+    function updateButtonStates(viewport, currentPos, maxPos) {
+        const prevBtn = viewport.parentElement.querySelector('.carousel-prev');
+        const nextBtn = viewport.parentElement.querySelector('.carousel-next');
+        
+        if (prevBtn) prevBtn.disabled = currentPos === 0;
+        if (nextBtn) nextBtn.disabled = currentPos === maxPos;
+    }
+
+    document.querySelectorAll('.carousel-prev').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-target');
+            const viewport = document.getElementById(id);
+            if (viewport) slideCards(viewport, -1);
+        });
+    });
+    document.querySelectorAll('.carousel-next').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-target');
+            const viewport = document.getElementById(id);
+            if (viewport) slideCards(viewport, 1);
+        });
+    });
+    
+    // Initialize button states on page load
+    document.querySelectorAll('.carousel-viewport').forEach(viewport => {
+        const track = viewport.querySelector('.' + TRACK_CLASS);
+        if (track) {
+            const cards = track.querySelectorAll(CARD_SELECTOR);
+            const cardWidth = 280 + 16;
+            const cardsPerView = Math.floor(viewport.clientWidth / cardWidth);
+            const maxPos = Math.max(0, cards.length - cardsPerView);
+            updateButtonStates(viewport, 0, maxPos);
+        }
+    });
+}
+
+// Add smooth scrolling for better UX
+function smoothScrollTo(element) {
+    element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+// Add keyboard navigation
+document.addEventListener('keydown', function(e) {
+    // Press 'S' to focus search
+    if (e.key.toLowerCase() === 's' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput && document.activeElement !== searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+});
+</script>
+{% endblock %}
+
 {% block extra_head %}
 <style>
+/* Elegant Black & White Theme */
+body {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #000000 0%, #333333 50%, #666666 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.03)" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+    background-size: cover;
+    z-index: 1;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
 }
 
 .product-card {
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+    transition: left 0.5s;
+}
+
+.product-card:hover::before {
+    left: 100%;
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: #000000;
+}
+/* Grid layout styles with sliding animation - 3 products per row */
+.carousel-viewport {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 16px;
+    transition: transform 0.3s ease;
+    width: max-content;
+}
+
+.product-card--carousel {
+    min-width: 280px;
+    max-width: 320px;
+    flex-shrink: 0;
+}
+
+.featured-row .btn.btn-outline-secondary.btn-sm {
+    border-radius: 50px;
+    border: 2px solid #000000;
+    color: #000000;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.featured-row .btn.btn-outline-secondary.btn-sm:hover {
+    background: #000000;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.featured-row + .featured-row {
+    margin-top: 2rem;
 }
 
 .category-link {
-    padding: 0.25rem 0;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s ease;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: block;
+    text-decoration: none;
+    color: #666666;
+    border: 1px solid transparent;
 }
 
 .category-link:hover {
-    background-color: rgba(0,0,0,0.05);
-    padding-left: 1rem;
+    background-color: #f8f9fa;
+    color: #000000;
+    text-decoration: none;
+    transform: translateX(8px);
+    border-color: #e5e5e5;
+}
+
+/* Featured Products Section */
+.featured-products {
+    background: #f8f9fa;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Categories Section */
+.categories-section {
+    background: #ffffff;
+}
+
+.categories-section .card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.categories-section .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.categories-section .card-header {
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+.categories-section .bg-primary {
+    background: #000000 !important;
+}
+
+.categories-section .bg-success {
+    background: #333333 !important;
+}
+
+.categories-section .bg-warning {
+    background: #666666 !important;
+    color: #ffffff !important;
 }
 
 .feature-icon {
     transition: transform 0.3s ease;
 }
 
-.card:hover .feature-icon {
-    transform: scale(1.1);
+/* Hero Section Text */
+.hero-section h1 {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
+.hero-section p {
+    color: #e5e5e5;
+    font-weight: 400;
+}
+
+.hero-section .btn {
+    border-radius: 50px;
+    padding: 12px 32px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.hero-section .btn-primary {
+    background: #ffffff;
+    border: 2px solid #ffffff;
+    color: #000000;
+}
+
+.hero-section .btn-primary:hover {
+    background: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.hero-section .btn-outline-light {
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    background: transparent;
+}
+
+.hero-section .btn-outline-light:hover {
+    background: #ffffff;
+    color: #000000;
+    transform: translateY(-2px);
+}
+
+/* Search Box */
+.search-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e5e5e5;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+}
+
+.search-box:focus-within {
+    border-color: #000000;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    color: #000000;
+    font-weight: 500;
+}
+
+.search-box input::placeholder {
+    color: #999999;
+}
+
+.search-box button {
+    background: #000000;
+    border: none;
+    border-radius: 50px;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.search-box button:hover {
+    background: #333333;
+    transform: scale(1.05);
+}
+
+/* Badge Styles */
+.badge {
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.bg-primary {
+    background: #000000 !important;
+}
+
+/* Rating Stars */
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-muted {
+    color: #666666 !important;
+}
+
+/* Section Headers */
+.display-6 {
+    color: #000000;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.text-muted {
+    color: #666666;
+}
+
+.card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Stats animation */
+.h4 {
+    transition: all 0.3s ease;
+}
+
+.h4:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced button styles */
+.btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading animation for stats */
+.h4 {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Enhanced responsive design */
 @media (max-width: 768px) {
     .hero-section .display-4 {
         font-size: 2rem;
@@ -319,6 +901,59 @@
     
     .hero-section .lead {
         font-size: 1rem;
+    }
+    
+    .hero-section .btn-lg {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .d-flex.flex-wrap.gap-2 {
+        justify-content: center;
+    }
+    
+    .row.g-3 .col-4 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .hero-section .display-4 {
+        font-size: 1.75rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Enhanced accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .hero-section {
+        /* background: white !important; */
+        color: black !important;
+    }
+    
+    .btn {
+        border: 1px solid black !important;
+        background: white !important;
+        color: black !important;
     }
 }
 </style>
