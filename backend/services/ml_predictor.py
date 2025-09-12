@@ -1,6 +1,6 @@
 """
 Machine Learning Prediction Service
-Enhanced ML prediction system using models from Milestone I
+Exact implementation matching Milestone I architecture
 """
 
 import pandas as pd
@@ -14,7 +14,7 @@ from backend.services.text_processor import TextProcessor
 from backend.config.settings import Config
 
 class MLPredictor:
-    """Enhanced Machine Learning prediction system"""
+    """Machine Learning prediction system matching Milestone I implementation"""
     
     def __init__(self):
         self.text_processor = TextProcessor()
@@ -26,9 +26,9 @@ class MLPredictor:
         self.df = None
         
     def load_models_and_data(self):
-        """Load trained models and prepare data with enhanced error handling"""
+        """Load trained models and prepare data matching Milestone I approach"""
         try:
-            # Try multiple paths for the dataset
+            # Load the dataset
             for path in Config.DATASET_PATHS:
                 try:
                     self.df = pd.read_csv(path)
@@ -43,7 +43,7 @@ class MLPredictor:
             # Clean the dataset
             self.df = self._clean_dataset(self.df)
             
-            # Prepare features for different models
+            # Prepare features for different models (Milestone I approach)
             self._prepare_bow_model()
             self._prepare_title_struct_model()
             self._prepare_ensemble_model()
@@ -59,7 +59,7 @@ class MLPredictor:
     
     def _clean_dataset(self, df):
         """Clean and validate the dataset"""
-        # Fill missing values
+        # Fill missing values exactly as in Milestone I
         df['Review Text'] = df['Review Text'].fillna('')
         df['Title'] = df['Title'].fillna('')
         df['Clothes Title'] = df['Clothes Title'].fillna('Product')
@@ -67,9 +67,9 @@ class MLPredictor:
         df['Rating'] = df['Rating'].fillna(df['Rating'].median())
         df['Recommended IND'] = df['Recommended IND'].fillna(1)
         
-        # Fill categorical columns
+        # Fill categorical columns exactly as in Milestone I
         for col in ['Division Name', 'Department Name', 'Class Name']:
-            df[col] = df[col].fillna('General')
+            df[col] = df[col].fillna('Unknown')
         
         return df
     
@@ -90,30 +90,29 @@ class MLPredictor:
         })
     
     def _prepare_bow_model(self):
-        """Prepare Bag-of-Words model with error handling"""
+        """Prepare Bag-of-Words model exactly as in Milestone I"""
         try:
-            # Process review texts
+            # Process review texts using Milestone I approach
             processed_texts = [self.text_processor.preprocess_text(str(text)) 
                              for text in self.df["Review Text"]]
             
-            # Remove empty texts
+            # Remove empty texts (match Milestone I behavior)
             processed_texts = [text if text.strip() else "good product" for text in processed_texts]
             
-            # Create CountVectorizer for BoW
+            # Create CountVectorizer exactly as in Milestone I
             self.vectorizers['bow'] = CountVectorizer(
-                max_features=min(Config.MAX_FEATURES_BOW, len(processed_texts)), 
-                min_df=Config.MIN_DF,
-                max_df=Config.MAX_DF
+                max_features=10000,  # Match Milestone I
+                min_df=2  # Match Milestone I
             )
             X_bow = self.vectorizers['bow'].fit_transform(processed_texts)
             
-            # Train logistic regression
+            # Train logistic regression exactly as in Milestone I
             y = self.df["Recommended IND"].values
             self.models['bow'] = LogisticRegression(
-                max_iter=1000, 
-                solver="liblinear", 
-                random_state=42, 
-                class_weight="balanced"
+                max_iter=2000,  # Match Milestone I
+                solver="liblinear",  # Match Milestone I
+                random_state=42,  # Match Milestone I
+                class_weight="balanced"  # Match Milestone I
             )
             self.models['bow'].fit(X_bow, y)
             
@@ -123,44 +122,43 @@ class MLPredictor:
             print(f"Error preparing BoW model: {e}")
     
     def _prepare_title_struct_model(self):
-        """Prepare Title + Structured features model with error handling"""
+        """Prepare Title + Structured features model exactly as in Milestone I"""
         try:
-            # Prepare title features
-            titles = [str(title) for title in self.df["Title"]]
+            # Prepare title features exactly as in Milestone I
+            titles = self.df["Title"].fillna("").astype(str)
             self.vectorizers['title'] = CountVectorizer(
-                max_features=min(Config.MAX_FEATURES_TITLE, len(titles)), 
-                min_df=Config.MIN_DF,
-                max_df=Config.MAX_DF
+                max_features=5000,  # Match Milestone I
+                min_df=2  # Match Milestone I
             )
             X_title = self.vectorizers['title'].fit_transform(titles)
             
-            # Prepare structured features
+            # Prepare structured features exactly as in Milestone I
             struct_df = self.df[["Rating", "Division Name", "Department Name", "Class Name"]].copy()
             struct_df["Rating"] = struct_df["Rating"].fillna(struct_df["Rating"].median())
             for col in ["Division Name", "Department Name", "Class Name"]:
-                struct_df[col] = struct_df[col].fillna("General")
+                struct_df[col] = struct_df[col].fillna("Unknown")  # Match Milestone I
             
-            # Scale numeric features
+            # Scale numeric features exactly as in Milestone I
             self.scalers['struct'] = StandardScaler()
             X_num = self.scalers['struct'].fit_transform(struct_df[["Rating"]])
             
-            # Encode categorical features
+            # Encode categorical features exactly as in Milestone I
             self.encoders['struct'] = OneHotEncoder(handle_unknown="ignore", sparse_output=True)
             X_cat = self.encoders['struct'].fit_transform(
                 struct_df[["Division Name", "Department Name", "Class Name"]]
             )
             
-            # Combine features
+            # Combine features exactly as in Milestone I
             X_struct = hstack([csr_matrix(X_num), X_cat])
             X_combined = hstack([X_title, X_struct]).tocsr()
             
-            # Train model
+            # Train model exactly as in Milestone I
             y = self.df["Recommended IND"].values
             self.models['title_struct'] = LogisticRegression(
-                max_iter=1000, 
-                solver="liblinear", 
-                random_state=42, 
-                class_weight="balanced"
+                max_iter=2000,  # Match Milestone I
+                solver="liblinear",  # Match Milestone I
+                random_state=42,  # Match Milestone I
+                class_weight="balanced"  # Match Milestone I
             )
             self.models['title_struct'].fit(X_combined, y)
             
@@ -170,25 +168,24 @@ class MLPredictor:
             print(f"Error preparing Title + Struct model: {e}")
     
     def _prepare_ensemble_model(self):
-        """Prepare ensemble prediction weights"""
-        # Adjust weights to give more importance to structured features
-        # which are more reliable for ratings and categorical data
+        """Prepare ensemble prediction weights exactly as in Milestone I"""
+        # Based on Milestone I results, BoW performed best
         self.ensemble_weights = {
-            'bow': 0.4,  # Reduced from 0.7 to 0.4
-            'title_struct': 0.6  # Increased from 0.3 to 0.6
+            'bow': 0.6,  # Match Milestone I
+            'title_struct': 0.4  # Match Milestone I
         }
     
     def predict_recommendation(self, review_title, review_text, rating=5, 
                              division="General", department="Tops", class_name="Blouses"):
-        """Predict recommendation for a new review with enhanced error handling"""
+        """Predict recommendation exactly as in Milestone I"""
         if not self.is_loaded or not self.models:
-            return {'prediction': 1, 'confidence': 0.75, 'model_predictions': {}, 'status': 'fallback'}
+            return {'prediction': 1, 'confidence': 0.5, 'model_predictions': {}, 'status': 'fallback'}
         
         try:
             predictions = {}
             confidences = {}
             
-            # BoW prediction
+            # BoW prediction exactly as in Milestone I
             if 'bow' in self.models and 'bow' in self.vectorizers:
                 try:
                     processed_text = self.text_processor.preprocess_text(str(review_text))
@@ -203,13 +200,13 @@ class MLPredictor:
                 except Exception as e:
                     print(f"Error in BoW prediction: {e}")
             
-            # Title + Struct prediction
+            # Title + Struct prediction exactly as in Milestone I
             if 'title_struct' in self.models and 'title' in self.vectorizers:
                 try:
                     # Title features
                     X_title = self.vectorizers['title'].transform([str(review_title)])
                     
-                    # Structured features
+                    # Structured features exactly as in Milestone I
                     struct_data = pd.DataFrame({
                         'Rating': [float(rating)],
                         'Division Name': [str(division)],
@@ -231,7 +228,7 @@ class MLPredictor:
                 except Exception as e:
                     print(f"Error in Title+Struct prediction: {e}")
             
-            # Ensemble prediction
+            # Ensemble prediction exactly as in Milestone I
             if predictions:
                 weighted_pred = sum(
                     predictions[model] * self.ensemble_weights.get(model, 0.5)
@@ -239,11 +236,11 @@ class MLPredictor:
                 )
                 ensemble_pred = 1 if weighted_pred >= 0.5 else 0
                 
-                # Calculate ensemble confidence
+                # Calculate ensemble confidence exactly as in Milestone I
                 weighted_conf = sum(
                     confidences[model] * self.ensemble_weights.get(model, 0.5)
                     for model in confidences
-                ) / len(confidences) if confidences else 0.75
+                ) if confidences else 0.5
                 
                 return {
                     'prediction': int(ensemble_pred),
@@ -253,11 +250,11 @@ class MLPredictor:
                     'status': 'success'
                 }
             else:
-                # Fallback prediction based on rating
+                # Fallback prediction based on rating (simple rule)
                 fallback_pred = 1 if rating >= 4 else 0
                 return {
                     'prediction': fallback_pred, 
-                    'confidence': 0.6, 
+                    'confidence': 0.5, 
                     'model_predictions': {},
                     'status': 'fallback'
                 }
