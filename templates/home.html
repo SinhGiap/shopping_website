@@ -201,7 +201,10 @@
                                         <small class="text-muted ms-1">{{ "%.1f"|format(item['Rating']) }}</small>
                                     </div>
                                 </div>
-                                <h6 class="card-title fw-bold text-black" title="{{ item['Clothes Title'] }}">{{ item['Clothes Title'] }}</h6>
+                                <h6 class="card-title fw-bold text-black" title="{{ item['Clothes Title'].split('(')[0].strip() }}">
+                                    {{ item['Clothes Title'].split('(')[0].strip() }}
+                                </h6>
+                                <small class="text-muted">#{{ item['Clothing ID'] }}</small>
                                 <p class="card-text text-muted small mb-3">{{ item['Clothes Description'][:100] }}{% if item['Clothes Description']|length > 100 %}...{% endif %}</p>
                                 <div class="mt-auto">
                                     <small class="text-muted d-block mb-2">

@@ -182,6 +182,7 @@
                         <!-- Product Info -->
                         <h5 class="fw-bold mb-3 text-black">
                             {{ product['Clothes Title'] or product['Title'] or 'PRODUCT' }}
+                            <small class="text-muted">#{{ product['Clothing ID'] }}</small>
                         </h5>
                         
                         <p class="text-muted mb-4">
@@ -666,6 +667,8 @@ document.addEventListener('DOMContentLoaded', function() {
     .text-end {
         text-align: start !important;
     }
+    
+    
 }
 
 @media (max-width: 576px) {
