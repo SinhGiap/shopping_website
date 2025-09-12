@@ -28,7 +28,9 @@ def initialize_services():
         _search_engine = SearchEngine(_dataframe)
         
         print("Services initialized successfully!")
-        print(f"Dataset loaded with {len(_dataframe)} records")
+        if _dataframe is None:
+            print("[ERROR] _dataframe is None before len() check!")
+        print(f"Dataset loaded with {len(_dataframe) if _dataframe is not None else 'None'} records")
         
         return True
         
@@ -105,8 +107,12 @@ def get_review_statistics(clothing_id):
         return {'avg_rating': 0, 'review_count': 0}
     
     ratings = [review['Rating'] for review in all_reviews]
+    if ratings is None:
+        print("[ERROR] ratings is None before len() check!")
     avg_rating = sum(ratings) / len(ratings) if ratings else 0
-    review_count = len(all_reviews)
+    if all_reviews is None:
+        print("[ERROR] all_reviews is None before len() check!")
+    review_count = len(all_reviews) if all_reviews is not None else 0
     
     return {
         'avg_rating': round(avg_rating, 1),
