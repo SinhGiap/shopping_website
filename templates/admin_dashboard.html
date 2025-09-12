@@ -1,0 +1,576 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Enhanced Shopping Website{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #ffffff; min-height: 100vh;">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold text-black mb-2">
+                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">System overview and management</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('main.home') }}" class="btn btn-outline-dark">
+                        <i class="bi bi-house"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> Error loading dashboard: {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- System Status Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">
+                        <i class="bi bi-box"></i>
+                    </div>
+                    <h3 class="fw-bold text-black">{{ stats.total_products or 0 }}</h3>
+                    <p class="text-muted mb-0">Total Products</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-info mb-3">
+                        <i class="bi bi-chat-dots"></i>
+                    </div>
+                    <h3 class="fw-bold text-black">{{ stats.total_reviews or 0 }}</h3>
+                    <p class="text-muted mb-0">Total Reviews</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-warning mb-3">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-black">{{ "%.1f"|format(stats.avg_rating or 0) }}</h3>
+                    <p class="text-muted mb-0">Average Rating</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-success mb-3">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-black">{{ "%.1f"|format(stats.recommendation_rate or 0) }}%</h3>
+                    <p class="text-muted mb-0">Recommendation Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Status -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cpu"></i> System Health
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-black">ML Models</span>
+                                <span class="badge {{ 'bg-success' if stats.ml_loaded else 'bg-danger' }}">
+                                    {{ 'Loaded' if stats.ml_loaded else 'Not Loaded' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-black">Search Engine</span>
+                                <span class="badge {{ 'bg-success' if stats.search_available else 'bg-danger' }}">
+                                    {{ 'Available' if stats.search_available else 'Unavailable' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-black">Database</span>
+                                <span class="badge {{ 'bg-success' if stats.total_products > 0 else 'bg-warning' }}">
+                                    {{ 'Connected' if stats.total_products > 0 else 'No Data' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.search') }}" class="btn btn-outline-dark">
+                            <i class="bi bi-search"></i> View All Products
+                        </a>
+                        <a href="{{ url_for('api.get_stats') }}" class="btn btn-outline-dark" target="_blank">
+                            <i class="bi bi-download"></i> Export Stats (JSON)
+                        </a>
+                        <a href="{{ url_for('api.get_categories') }}" class="btn btn-outline-dark" target="_blank">
+                            <i class="bi bi-tags"></i> View Categories (JSON)
+                        </a>
+                        <a href="{{ url_for('main.health_check') }}" class="btn btn-outline-dark" target="_blank">
+                            <i class="bi bi-heart-pulse"></i> Health Check (JSON)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Distribution -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-collection"></i> Collections
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if categories.divisions %}
+                        {% for division, count in categories.divisions.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-black">{{ division }}</span>
+                            <span class="badge bg-primary">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-grid"></i> Departments
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if categories.departments %}
+                        {% for department, count in categories.departments.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-black">{{ department }}</span>
+                            <span class="badge bg-info">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tag"></i> Product Types
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if categories.classes %}
+                        {% for class_name, count in categories.classes.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-black">{{ class_name }}</span>
+                            <span class="badge bg-warning text-dark">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-black text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-square-text"></i> Recent Reviews
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_reviews %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Title</th>
+                                        <th>Review</th>
+                                        <th>Rating</th>
+                                        <th>Recommended</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for review in recent_reviews %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('product.product_detail', clothing_id=review['Clothing ID']) }}" 
+                                               class="text-decoration-none">
+                                                {{ review['Clothing ID'] }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ review['Title'] }}">
+                                                {{ review['Title'] }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 300px;" title="{{ review['Review Text'] }}">
+                                                {{ review['Review Text'] }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% for i in range(5) %}
+                                                    {% if i < review['Rating'] %}
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star text-muted"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <span class="ms-2 text-muted">{{ review['Rating'] }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if review['Recommended IND'] == 1 %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-hand-thumbs-up"></i> Yes
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-hand-thumbs-down"></i> No
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No reviews available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Modern Blue and Gray Theme for Admin Dashboard */
+body {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container-fluid {
+    background: transparent;
+}
+
+.card {
+    transition: all 0.3s ease-in-out;
+    background: #ffffff;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #2c3e50;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(31, 38, 135, 0.25);
+}
+
+.card-header {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.25rem;
+    font-weight: 600;
+}
+
+.card-body {
+    background: #ffffff;
+    color: #2c3e50;
+    border-radius: 0 0 15px 15px;
+}
+
+/* System Status Cards */
+.display-4 {
+    font-size: 2.5rem;
+    color: #667eea;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.text-primary {
+    color: #667eea !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75em;
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 0.5em 1em;
+}
+
+.bg-primary {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+}
+
+.bg-info {
+    background-color: #17a2b8 !important;
+    color: #ffffff !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+    color: #ffffff !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+/* Table Styling */
+.table {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table td {
+    vertical-align: middle;
+    border: none;
+    color: #2c3e50;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Buttons */
+.btn-outline-dark {
+    border: 2px solid #667eea;
+    color: #667eea;
+    background-color: #ffffff;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1.5rem;
+}
+
+.btn-outline-dark:hover {
+    background-color: #2c3e50;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+}
+
+/* Alert */
+.alert-danger {
+    background-color: #dc3545;
+    border: none;
+    color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+}
+
+.alert-danger i {
+    color: #ffffff;
+}
+
+/* Text Colors */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-black {
+    color: #2c3e50 !important;
+}
+
+/* Icons */
+.bi {
+    color: #667eea;
+}
+
+.card-header .bi {
+    color: #ffffff;
+}
+
+/* Header styling */
+.display-6 {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+/* Links */
+a {
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #764ba2;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* Star Ratings */
+.bi-star-fill {
+    color: #ffc107 !important;
+}
+
+.bi-star {
+    color: #e9ecef !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #2c3e50;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #1a252f;
+}
+
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Status indicators */
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+</style>
+{% endblock %}

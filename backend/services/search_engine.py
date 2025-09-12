@@ -223,7 +223,7 @@ class SearchEngine:
         return self._get_unique_products(filtered_df.head(limit * 10)).head(limit)
     
     def get_featured_items(self, limit=None):
-        """Get featured items with highest ratings - returns unique products"""
+        """Get featured items with highest ratings - returns 12 products from 4 specific categories for carousel"""
         if limit is None:
             limit = Config.FEATURED_ITEMS_LIMIT
             
@@ -233,7 +233,35 @@ class SearchEngine:
         try:
             # Get unique products with highest average ratings
             unique_products = self._get_unique_products(self.df)
-            featured = unique_products.nlargest(limit, 'Rating')
+            
+            # Specific 4 categories as requested
+            target_categories = ['Blouses', 'Dresses', 'Intimates', 'Jackets']
+            
+            # Get products from these specific 4 categories only
+            products_from_target_categories = unique_products[
+                unique_products['Class Name'].isin(target_categories)
+            ]
+            
+            # Get enough products from each of the 4 categories for carousel
+            featured_by_category = []
+            products_per_category = 12  # Enough products for carousel animation
+            
+            for class_name in target_categories:
+                class_products = products_from_target_categories[
+                    products_from_target_categories['Class Name'] == class_name
+                ]
+                if not class_products.empty:
+                    top_in_class = class_products.nlargest(products_per_category, 'Rating')
+                    featured_by_category.append(top_in_class)
+            
+            # Combine all products from the 4 categories
+            if featured_by_category:
+                combined = pd.concat(featured_by_category, ignore_index=True)
+                # Remove duplicates and keep order by category
+                combined = combined.drop_duplicates(subset=['Clothing ID'])
+                featured = combined
+            else:
+                featured = unique_products.nlargest(limit, 'Rating')
             
             # Use Display Title if available, otherwise fall back to Clothes Title
             title_column = 'Display Title' if 'Display Title' in featured.columns else 'Clothes Title'

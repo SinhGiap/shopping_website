@@ -2,44 +2,139 @@
 
 {% block title %}{{ product['Clothes Title'] or product['Title'] }} - Product Details{% endblock %}
 
+{% block extra_head %}
+<style>
+/* Product Page Specific Styles */
+.product-page {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.product-page .text-muted {
+    color: #666666 !important;
+}
+
+.product-page .card {
+    background-color: #ffffff;
+    border: 2px solid #e5e5e5;
+    color: #000000;
+}
+
+.product-page .card-body {
+    color: #000000;
+}
+
+.product-page .form-control {
+    background-color: #ffffff;
+    border: 2px solid #e5e5e5;
+    color: #000000;
+}
+
+.product-page .form-control:focus {
+    background-color: #ffffff;
+    border-color: #000000;
+    color: #000000;
+}
+
+.product-page .btn-primary {
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+.product-page .btn-primary:hover {
+    background-color: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+.product-page .btn-outline-primary {
+    border-color: #000000;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+.product-page .btn-outline-primary:hover {
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+.product-page .badge {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.product-page .table {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.product-page .table th {
+    background-color: #f8f9fa;
+    color: #000000;
+    border-bottom: 2px solid #000000;
+}
+
+.product-page .table td {
+    color: #000000;
+    border-color: #e5e5e5;
+}
+
+.product-page .alert {
+    background-color: #f8f9fa;
+    border: 2px solid #e5e5e5;
+    color: #000000;
+}
+
+.product-page .alert-success {
+    border-left: 4px solid #28a745;
+}
+
+.product-page .alert-danger {
+    border-left: 4px solid #dc3545;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-4">
+<div class="container py-5 product-page" style="background-color: #ffffff; min-height: 100vh;">
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
+    <nav aria-label="breadcrumb" class="mb-5">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('main.search') }}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}" class="text-black">HOME</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.search') }}" class="text-black">PRODUCTS</a></li>
             {% if product['Department Name'] %}
             <li class="breadcrumb-item">
-                <a href="{{ url_for('main.search', department=product['Department Name']) }}">{{ product['Department Name'] }}</a>
+                <a href="{{ url_for('main.search', department=product['Department Name']) }}" class="text-black">{{ product['Department Name']|upper }}</a>
             </li>
             {% endif %}
-            <li class="breadcrumb-item active">{{ product['Clothes Title'] or product['Title'] }}</li>
+            <li class="breadcrumb-item active text-black">{{ (product['Clothes Title'] or product['Title'])|upper }}</li>
         </ol>
     </nav>
 
     <!-- Product Header -->
-    <div class="row mb-4">
+    <div class="row mb-5">
         <div class="col-lg-8">
-            <div class="d-flex align-items-start justify-content-between mb-3">
+            <div class="d-flex align-items-start justify-content-between mb-4">
                 <div>
-                    <h1 class="fw-bold mb-2">{{ product['Clothes Title'] or product['Title'] or 'Product' }}</h1>
-                    <div class="product-badges mb-2">
+                    <h1 class="display-6 fw-bold mb-3 text-black">{{ (product['Clothes Title'] or product['Title'] or 'PRODUCT')|upper }}</h1>
+                    <div class="product-badges mb-3">
                         {% if product['Division Name'] %}
-                            <span class="badge bg-primary me-2">{{ product['Division Name'] }}</span>
+                            <span class="badge bg-black text-white me-2">{{ product['Division Name']|upper }}</span>
                         {% endif %}
                         {% if product['Department Name'] %}
-                            <span class="badge bg-success me-2">{{ product['Department Name'] }}</span>
+                            <span class="badge bg-black text-white me-2">{{ product['Department Name']|upper }}</span>
                         {% endif %}
                         {% if product['Class Name'] %}
-                            <span class="badge bg-warning text-dark">{{ product['Class Name'] }}</span>
+                            <span class="badge bg-black text-white">{{ product['Class Name']|upper }}</span>
                         {% endif %}
                     </div>
                 </div>
                 <div class="text-end">
-                    <div class="rating-display mb-2">
+                    <div class="rating-display mb-3">
                         {% if avg_rating > 0 %}
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center justify-content-end">
                                 {% for i in range(5) %}
                                     {% if i < avg_rating %}
                                         <i class="bi bi-star-fill text-warning"></i>
@@ -47,7 +142,7 @@
                                         <i class="bi bi-star text-muted"></i>
                                     {% endif %}
                                 {% endfor %}
-                                <span class="ms-2 fw-bold">{{ avg_rating }}</span>
+                                <span class="ms-2 fw-bold text-black">{{ avg_rating }}</span>
                             </div>
                             <small class="text-muted">Based on {{ review_count }} review{{ 's' if review_count != 1 else '' }}</small>
                         {% else %}
@@ -60,8 +155,8 @@
             <!-- Product Description -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-info-circle text-primary"></i> Product Description
+                    <h5 class="card-title text-dark">
+                        <i class="bi bi-info-circle"></i> Product Description
                     </h5>
                     <p class="card-text">{{ product['Clothes Description'] or 'No description available.' }}</p>
                 </div>
@@ -72,7 +167,7 @@
             <!-- Action Card -->
             <div class="card border-0 shadow-sm sticky-top">
                 <div class="card-body text-center">
-                    <h5 class="card-title mb-3">
+                    <h5 class="card-title mb-3 text-dark">
                         <i class="bi bi-heart text-danger"></i> Love this product?
                     </h5>
                     <p class="text-muted mb-4">Share your experience and help other shoppers!</p>
@@ -135,14 +230,42 @@
                 </div>
             </div>
             
+            <!-- Review Filters -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="reviewFilter" id="filter-all" value="all" checked>
+                        <label class="btn btn-outline-primary" for="filter-all">All Reviews</label>
+                        
+                        <input type="radio" class="btn-check" name="reviewFilter" id="filter-recommended" value="recommended">
+                        <label class="btn btn-outline-success" for="filter-recommended">Recommended</label>
+                        
+                        <input type="radio" class="btn-check" name="reviewFilter" id="filter-new" value="new">
+                        <label class="btn btn-outline-info" for="filter-new">New Reviews</label>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="sortReviews" id="sort-newest" value="newest" checked>
+                        <label class="btn btn-outline-secondary btn-sm" for="sort-newest">Newest</label>
+                        
+                        <input type="radio" class="btn-check" name="sortReviews" id="sort-rating" value="rating">
+                        <label class="btn btn-outline-secondary btn-sm" for="sort-rating">Rating</label>
+                        
+                        <input type="radio" class="btn-check" name="sortReviews" id="sort-helpful" value="helpful">
+                        <label class="btn btn-outline-secondary btn-sm" for="sort-helpful">Most Helpful</label>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Reviews List -->
-            <div class="reviews-container">
+            <div class="reviews-container" id="reviewsContainer">
                 {% for review in reviews[:10] %}
                 <div class="card border-0 shadow-sm mb-3{% if review.get('Is New') %} border-primary{% endif %}">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <h6 class="card-title fw-bold mb-1">
+                                <h6 class="card-title fw-bold mb-1 text-dark">
                                     {{ review['Title'] or 'Review' }}
                                     {% if review.get('Is New') %}
                                         <span class="badge bg-primary ms-2">
@@ -331,17 +454,148 @@ function loadMoreReviews() {
     alert('Loading more reviews... (Feature not implemented in demo)');
 }
 
-// Initialize tooltips
+// Initialize tooltips and review filtering
 document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+    
+    // Initialize review filtering
+    initializeReviewFiltering();
+    
+    // Add product image placeholder animation
+    addProductImagePlaceholder();
+    
+    // Add scroll-to-review functionality
+    addScrollToReview();
 });
+
+function initializeReviewFiltering() {
+    const filterButtons = document.querySelectorAll('input[name="reviewFilter"]');
+    const sortButtons = document.querySelectorAll('input[name="sortReviews"]');
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    
+    if (!reviewsContainer) return;
+    
+    // Store original reviews HTML
+    const originalReviewsHTML = reviewsContainer.innerHTML;
+    const allReviews = Array.from(reviewsContainer.querySelectorAll('.card'));
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            filterAndSortReviews();
+        });
+    });
+    
+    // Sort functionality
+    sortButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            filterAndSortReviews();
+        });
+    });
+    
+    function filterAndSortReviews() {
+        const selectedFilter = document.querySelector('input[name="reviewFilter"]:checked').value;
+        const selectedSort = document.querySelector('input[name="sortReviews"]:checked').value;
+        
+        let filteredReviews = [...allReviews];
+        
+        // Apply filter
+        if (selectedFilter === 'recommended') {
+            filteredReviews = filteredReviews.filter(card => {
+                const badge = card.querySelector('.badge');
+                return badge && badge.textContent.includes('Recommended');
+            });
+        } else if (selectedFilter === 'new') {
+            filteredReviews = filteredReviews.filter(card => {
+                return card.classList.contains('border-primary');
+            });
+        }
+        
+        // Apply sort
+        filteredReviews.sort((a, b) => {
+            if (selectedSort === 'rating') {
+                const ratingA = parseInt(a.querySelector('.review-rating .small')?.textContent || '0');
+                const ratingB = parseInt(b.querySelector('.review-rating .small')?.textContent || '0');
+                return ratingB - ratingA;
+            } else if (selectedSort === 'helpful') {
+                const helpfulA = parseInt(a.querySelector('.count')?.textContent || '0');
+                const helpfulB = parseInt(b.querySelector('.count')?.textContent || '0');
+                return helpfulB - helpfulA;
+            } else {
+                // Newest first (default order)
+                return 0;
+            }
+        });
+        
+        // Update display
+        reviewsContainer.innerHTML = '';
+        filteredReviews.forEach((review, index) => {
+            review.style.animationDelay = (index * 0.1) + 's';
+            review.classList.add('fade-in');
+            reviewsContainer.appendChild(review);
+        });
+        
+        // Show message if no reviews match filter
+        if (filteredReviews.length === 0) {
+            const noResultsMsg = document.createElement('div');
+            noResultsMsg.className = 'text-center py-4';
+            noResultsMsg.innerHTML = `
+                <i class="bi bi-search display-4 text-muted"></i>
+                <h5 class="text-muted mt-2">No reviews match your filter</h5>
+                <p class="text-muted">Try selecting a different filter option.</p>
+            `;
+            reviewsContainer.appendChild(noResultsMsg);
+        }
+    }
+}
+
+function addProductImagePlaceholder() {
+    // Add a placeholder for product images (could be enhanced with actual images)
+    const actionCard = document.querySelector('.sticky-top .card-body');
+    if (actionCard) {
+        const imagePlaceholder = document.createElement('div');
+        imagePlaceholder.className = 'mb-3';
+        imagePlaceholder.innerHTML = `
+            <div class="product-image-placeholder bg-light rounded d-flex align-items-center justify-content-center" 
+                 style="height: 200px; border: 2px dashed #dee2e6;">
+                <div class="text-center text-muted">
+                    <i class="bi bi-image display-4"></i>
+                    <div class="mt-2">Product Image</div>
+                    <small>Placeholder for product photo</small>
+                </div>
+            </div>
+        `;
+        
+        // Insert before the "Love this product?" heading
+        const heading = actionCard.querySelector('h5');
+        if (heading) {
+            actionCard.insertBefore(imagePlaceholder, heading);
+        }
+    }
+}
+
+function addScrollToReview() {
+    // Add smooth scroll to reviews section
+    const reviewLinks = document.querySelectorAll('a[href="#reviews"]');
+    reviewLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reviewsSection = document.getElementById('reviewsContainer');
+            if (reviewsSection) {
+                reviewsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
 </script>
 {% endblock %}
 
-{% block extra_head %}
 <style>
 .rating-display .bi-star-fill,
 .rating-display .bi-star {
@@ -404,4 +658,3 @@ html {
     animation: fadeIn 0.5s ease-in-out;
 }
 </style>
-{% endblock %}

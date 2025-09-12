@@ -3,33 +3,33 @@
 {% block title %}Write a Review - {{ product['Clothes Title'] or product['Title'] }}{% endblock %}
 
 {% block content %}
-<div class="container my-4">
+<div class="container py-5" style="background-color: #ffffff; min-height: 100vh;">
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
+    <nav aria-label="breadcrumb" class="mb-5">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}">{{ product['Clothes Title'] or product['Title'] }}</a></li>
-            <li class="breadcrumb-item active">Write Review</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}" class="text-black">HOME</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}" class="text-black">{{ (product['Clothes Title'] or product['Title'])|upper }}</a></li>
+            <li class="breadcrumb-item active text-black">WRITE REVIEW</li>
         </ol>
     </nav>
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Product Summary -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
+            <div class="border border-black mb-5">
+                <div class="p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h5 class="card-title fw-bold mb-2">{{ product['Clothes Title'] or product['Title'] }}</h5>
+                            <h3 class="fw-bold mb-3 text-black">{{ (product['Clothes Title'] or product['Title'])|upper }}</h3>
                             <p class="text-muted mb-0">{{ (product['Clothes Description'] or '')[:100] }}{% if (product['Clothes Description'] or '')|length > 100 %}...{% endif %}</p>
                         </div>
                         <div class="col-md-4 text-md-end">
                             <div class="product-badges">
                                 {% if product['Class Name'] %}
-                                    <span class="badge bg-primary">{{ product['Class Name'] }}</span>
+                                    <span class="badge bg-black text-white me-2">{{ product['Class Name']|upper }}</span>
                                 {% endif %}
                                 {% if product['Department Name'] %}
-                                    <span class="badge bg-success">{{ product['Department Name'] }}</span>
+                                    <span class="badge bg-black text-white">{{ product['Department Name']|upper }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -38,12 +38,12 @@
             </div>
 
             <!-- Review Form -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-pencil-square"></i> Write Your Review
-                    </h4>
-                    <small>Share your experience to help other shoppers</small>
+            <div class="border border-black">
+                <div class="bg-black text-white p-4">
+                    <h2 class="mb-2 fw-bold text-white" style="color: #fff !important;">
+                        WRITE YOUR REVIEW
+                    </h2>
+                    <div class="text-muted">Share your experience to help other shoppers</div>
                 </div>
                 <div class="card-body">
                     <form id="reviewForm" action="{{ url_for('product.submit_review') }}" method="POST">
@@ -51,78 +51,102 @@
                         
                         <!-- Review Title -->
                         <div class="mb-4">
-                            <label for="title" class="form-label fw-bold">
-                                <i class="bi bi-type text-primary"></i> Review Title *
+                            <label for="title" class="form-label fw-bold text-black">
+                                <i class="bi bi-type text-black"></i> REVIEW TITLE *
                             </label>
-                            <input type="text" class="form-control form-control-lg" id="title" name="title" 
+                            <input type="text" class="form-control form-control-lg border border-black" id="title" name="title" 
                                    placeholder="Summarize your experience..." required maxlength="200">
-                            <div class="form-text">Give your review a descriptive title (max 200 characters)</div>
+                            <div class="form-text text-muted">Give your review a descriptive title (max 200 characters)</div>
                         </div>
 
                         <!-- Rating -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="bi bi-star text-warning"></i> Overall Rating *
+                            <label class="form-label fw-bold text-black">
+                                <i class="bi bi-star text-black"></i> OVERALL RATING *
                             </label>
                             <div class="rating-input mb-2">
-                                <div class="btn-group" role="group" aria-label="Rating">
+                                <div class="btn-group border border-black" role="group" aria-label="Rating">
                                     {% for i in range(1, 6) %}
                                     <input type="radio" class="btn-check" name="rating" id="rating{{ i }}" value="{{ i }}" required>
-                                    <label class="btn btn-outline-warning" for="rating{{ i }}">
+                                    <label class="btn btn-outline-dark" for="rating{{ i }}">
                                         {{ i }} <i class="bi bi-star"></i>
                                     </label>
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="form-text">Rate from 1 (poor) to 5 (excellent)</div>
+                            <div class="form-text text-muted">Rate from 1 (poor) to 5 (excellent)</div>
                         </div>
 
                         <!-- Review Text -->
                         <div class="mb-4">
-                            <label for="review_text" class="form-label fw-bold">
-                                <i class="bi bi-chat-square-text text-success"></i> Your Review *
+                            <label for="review_text" class="form-label fw-bold text-black">
+                                <i class="bi bi-chat-square-text text-black"></i> YOUR REVIEW *
                             </label>
-                            <textarea class="form-control" id="review_text" name="review_text" rows="6" 
+                            <textarea class="form-control border border-black" id="review_text" name="review_text" rows="6" 
                                       placeholder="Tell us about your experience with this product. What did you like? What could be improved? How does it fit?" 
                                       required minlength="10"></textarea>
-                            <div class="form-text">
+                            <div class="form-text text-muted">
                                 <span id="charCount">0</span> characters. Minimum 10 characters required.
                             </div>
                         </div>
 
                         <!-- Recommendation -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="bi bi-heart text-danger"></i> Would you recommend this product?
+                            <label class="form-label fw-bold text-black">
+                                <i class="bi bi-heart text-black"></i> WOULD YOU RECOMMEND THIS PRODUCT?
                             </label>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recommended" id="recommend_yes" value="1" checked>
-                                <label class="form-check-label" for="recommend_yes">
-                                    <i class="bi bi-hand-thumbs-up text-success"></i> Yes, I'd recommend it
+                                <input class="form-check-input border border-black" type="radio" name="recommended" id="recommend_yes" value="1" checked>
+                                <label class="form-check-label text-black" for="recommend_yes">
+                                    <i class="bi bi-hand-thumbs-up text-black"></i> YES, I'D RECOMMEND IT
                                 </label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recommended" id="recommend_no" value="0">
-                                <label class="form-check-label" for="recommend_no">
-                                    <i class="bi bi-hand-thumbs-down text-danger"></i> No, I wouldn't recommend it
+                                <input class="form-check-input border border-black" type="radio" name="recommended" id="recommend_no" value="0">
+                                <label class="form-check-label text-black" for="recommend_no">
+                                    <i class="bi bi-hand-thumbs-down text-black"></i> NO, I WOULDN'T RECOMMEND IT
                                 </label>
                             </div>
                         </div>
 
                         <!-- ML Prediction Section -->
                         <div class="mb-4">
-                            <div class="card bg-light border-0">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <i class="bi bi-robot text-info"></i> AI Prediction
+                            <div class="border border-white" style="color: #ffffff !important;">
+                                <div class="bg-black text-white p-4">
+                                    <h6 class="mb-0 fw-bold text-white">
+                                        <i class="bi bi-robot"></i> AI-POWERED RECOMMENDATION PREDICTION
                                     </h6>
-                                    <p class="card-text text-muted mb-3">
-                                        Our machine learning model will predict if you'd recommend this product based on your review.
-                                    </p>
-                                    <button type="button" class="btn btn-info btn-sm" id="getPrediction">
-                                        <i class="bi bi-magic"></i> Get AI Prediction
-                                    </button>
+                                    <small class="text-white">Get instant AI prediction based on your review content</small>
+                                </div>
+                                <div class="p-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <p class="mb-0 text-black">
+                                                Our advanced machine learning model analyzes your review text, title, and rating 
+                                                to predict whether you would recommend this product to others.
+                                            </p>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-shield-check text-black"></i> 
+                                                    Uses multiple ML models for higher accuracy
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <button type="button" class="btn btn-outline-dark btn-lg" id="getPrediction">
+                                                <i class="bi bi-magic"></i> GET AI PREDICTION
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
                                     <div id="predictionResult" class="mt-3" style="display: none;"></div>
+                                    
+                                    <div class="mt-3 p-2 border border-black">
+                                        <small class="text-muted">
+                                            <strong>Note:</strong> The AI prediction is based on similar reviews and patterns. 
+                                            You can always override the prediction with your actual recommendation below.
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -130,11 +154,11 @@
                         <!-- Submit Button -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{{ url_for('product.product_detail', clothing_id=product['Clothing ID']) }}" 
-                               class="btn btn-outline-secondary me-md-2">
-                                <i class="bi bi-arrow-left"></i> Cancel
+                               class="btn btn-outline-dark me-md-2">
+                                <i class="bi bi-arrow-left"></i> CANCEL
                             </a>
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-circle"></i> Submit Review
+                                <i class="bi bi-check-circle"></i> SUBMIT REVIEW
                             </button>
                         </div>
                     </form>
@@ -142,27 +166,27 @@
             </div>
 
             <!-- Tips for Writing Reviews -->
-            <div class="card border-0 bg-light mt-4">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="bi bi-lightbulb text-warning"></i> Tips for Writing Helpful Reviews
+            <div class="border border-black mt-4">
+                <div class="p-4">
+                    <h6 class="fw-bold text-black mb-3">
+                        <i class="bi bi-lightbulb text-black"></i> TIPS FOR WRITING HELPFUL REVIEWS
                     </h6>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <i class="bi bi-check text-success"></i> 
-                            <strong>Be specific:</strong> Mention fit, quality, comfort, and appearance
+                        <li class="mb-2 text-black">
+                            <i class="bi bi-check text-black"></i> 
+                            <strong>BE SPECIFIC:</strong> Mention fit, quality, comfort, and appearance
                         </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check text-success"></i> 
-                            <strong>Be honest:</strong> Share both positives and areas for improvement
+                        <li class="mb-2 text-black">
+                            <i class="bi bi-check text-black"></i> 
+                            <strong>BE HONEST:</strong> Share both positives and areas for improvement
                         </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check text-success"></i> 
-                            <strong>Include context:</strong> Mention your size, occasion of use, etc.
+                        <li class="mb-2 text-black">
+                            <i class="bi bi-check text-black"></i> 
+                            <strong>INCLUDE CONTEXT:</strong> Mention your size, occasion of use, etc.
                         </li>
-                        <li class="mb-0">
-                            <i class="bi bi-check text-success"></i> 
-                            <strong>Be respectful:</strong> Keep your review constructive and helpful
+                        <li class="mb-0 text-black">
+                            <i class="bi bi-check text-black"></i> 
+                            <strong>BE RESPECTFUL:</strong> Keep your review constructive and helpful
                         </li>
                     </ul>
                 </div>
@@ -206,31 +230,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (index < rating) {
                     star.classList.remove('bi-star');
                     star.classList.add('bi-star-fill');
-                    label.classList.remove('btn-outline-warning');
-                    label.classList.add('btn-warning');
+                    label.classList.remove('btn-outline-dark');
+                    label.classList.add('btn-dark');
                 } else {
                     star.classList.remove('bi-star-fill');
                     star.classList.add('bi-star');
-                    label.classList.remove('btn-warning');
-                    label.classList.add('btn-outline-warning');
+                    label.classList.remove('btn-dark');
+                    label.classList.add('btn-outline-dark');
                 }
             });
         });
     });
     
-    // ML Prediction
-    getPredictionBtn.addEventListener('click', function() {
+    // Auto-prediction functionality
+    let predictionTimeout;
+    const autoPredictionThreshold = 50; // Minimum characters for auto-prediction
+    
+    function triggerAutoPrediction() {
+        const title = document.getElementById('title').value.trim();
+        const reviewText = document.getElementById('review_text').value.trim();
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        
+        // Clear existing timeout
+        clearTimeout(predictionTimeout);
+        
+        // Only trigger if we have enough content
+        if (title.length >= 3 && reviewText.length >= autoPredictionThreshold && rating) {
+            predictionTimeout = setTimeout(() => {
+                makePredictionRequest();
+            }, 2000); // Wait 2 seconds after user stops typing
+        }
+    }
+    
+    // Add auto-prediction listeners
+    document.getElementById('title').addEventListener('input', triggerAutoPrediction);
+    document.getElementById('review_text').addEventListener('input', triggerAutoPrediction);
+    ratingInputs.forEach(input => {
+        input.addEventListener('change', triggerAutoPrediction);
+    });
+    
+    function makePredictionRequest() {
         const title = document.getElementById('title').value.trim();
         const reviewText = document.getElementById('review_text').value.trim();
         const rating = document.querySelector('input[name="rating"]:checked')?.value;
         
         if (!title || !reviewText || !rating) {
-            alert('Please fill in the title, review text, and rating before getting a prediction.');
             return;
         }
         
         if (reviewText.length < 10) {
-            alert('Please write at least 10 characters in your review.');
             return;
         }
         
@@ -266,59 +314,169 @@ document.addEventListener('DOMContentLoaded', function() {
             getPredictionBtn.innerHTML = '<i class="bi bi-magic"></i> Get AI Prediction';
             getPredictionBtn.disabled = false;
         });
+    }
+    
+    // Manual ML Prediction button
+    getPredictionBtn.addEventListener('click', function() {
+        const title = document.getElementById('title').value.trim();
+        const reviewText = document.getElementById('review_text').value.trim();
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        
+        if (!title || !reviewText || !rating) {
+            alert('Please fill in the title, review text, and rating before getting a prediction.');
+            return;
+        }
+        
+        if (reviewText.length < 10) {
+            alert('Please write at least 10 characters in your review.');
+            return;
+        }
+        
+        makePredictionRequest();
     });
     
     function showPredictionResult(data) {
         const prediction = data.prediction;
         const confidence = (data.confidence * 100).toFixed(1);
         const status = data.status || 'success';
+        const modelPredictions = data.model_predictions || {};
+        const modelConfidences = data.model_confidences || {};
         
         let resultHtml = '';
         
-        if (prediction === 1) {
-            resultHtml = `
-                <div class="alert alert-success border-0">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-                        <div>
-                            <h6 class="mb-1">AI Prediction: You'll likely RECOMMEND this product</h6>
-                            <small>Confidence: ${confidence}%</small>
-                            ${status === 'fallback' ? '<br><small class="text-muted">(Based on simplified analysis)</small>' : ''}
-                        </div>
+        // Create model details section
+        let modelDetailsHtml = '';
+        if (Object.keys(modelPredictions).length > 0) {
+            modelDetailsHtml = `
+                <div class="mt-3 p-3 bg-light border border-black">
+                    <h6 class="mb-3 text-black">
+                        <i class="bi bi-gear"></i> Model Analysis Details
+                    </h6>
+                    <div class="row">
+                        ${Object.entries(modelPredictions).map(([modelName, modelPred]) => {
+                            const modelConf = (modelConfidences[modelName] * 100).toFixed(1);
+                            const modelIcon = modelPred === 1 ? 'bi-check-circle text-success' : 'bi-x-circle text-danger';
+                            const modelBadge = modelPred === 1 ? 'bg-success' : 'bg-danger';
+                            return `
+                                <div class="col-md-6 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi ${modelIcon} me-2"></i>
+                                        <span class="text-black fw-bold">${modelName.replace('_', ' ').toUpperCase()}:</span>
+                                        <span class="badge ${modelBadge} ms-2">${modelPred === 1 ? 'RECOMMEND' : 'NOT RECOMMEND'}</span>
+                                        <span class="text-muted ms-2">(${modelConf}%)</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
-                </div>
-            `;
-        } else {
-            resultHtml = `
-                <div class="alert alert-warning border-0">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-                        <div>
-                            <h6 class="mb-1">AI Prediction: You might NOT recommend this product</h6>
-                            <small>Confidence: ${confidence}%</small>
-                            ${status === 'fallback' ? '<br><small class="text-muted">(Based on simplified analysis)</small>' : ''}
-                        </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            Final prediction uses ensemble method combining multiple models for higher accuracy.
+                        </small>
                     </div>
                 </div>
             `;
         }
         
-        if (data.model_predictions && Object.keys(data.model_predictions).length > 0) {
+        if (prediction === 1) {
+            resultHtml = `
+                <div class="alert alert-success border-0 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill fs-2 me-3 text-success"></i>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1 text-success">🎉 AI Prediction: RECOMMEND</h5>
+                            <p class="mb-2">Based on your review content, our AI predicts you would recommend this product to others.</p>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: ${confidence}%"></div>
+                                </div>
+                                <span class="badge bg-success fs-6">${confidence}% confidence</span>
+                            </div>
+                            ${status === 'fallback' ? '<small class="text-muted d-block mt-2">(Based on simplified analysis)</small>' : ''}
+                            ${status === 'error' ? '<small class="text-muted d-block mt-2">(Using fallback prediction due to processing error)</small>' : ''}
+                        </div>
+                    </div>
+                    ${modelDetailsHtml}
+                </div>
+            `;
+            
+            // Auto-select "Yes" recommendation
+            document.getElementById('recommend_yes').checked = true;
+            
+        } else {
+            resultHtml = `
+                <div class="alert alert-warning border-0 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 me-3 text-warning"></i>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1 text-warning">⚠️ AI Prediction: NOT RECOMMEND</h5>
+                            <p class="mb-2">Based on your review content, our AI predicts you might not recommend this product.</p>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: ${confidence}%"></div>
+                                </div>
+                                <span class="badge bg-warning text-dark fs-6">${confidence}% confidence</span>
+                            </div>
+                            ${status === 'fallback' ? '<small class="text-muted d-block mt-2">(Based on simplified analysis)</small>' : ''}
+                            ${status === 'error' ? '<small class="text-muted d-block mt-2">(Using fallback prediction due to processing error)</small>' : ''}
+                        </div>
+                    </div>
+                    ${modelDetailsHtml}
+                </div>
+            `;
+            
+            // Auto-select "No" recommendation
+            document.getElementById('recommend_no').checked = true;
+        }
+        
+        if ((data.model_predictions && Object.keys(data.model_predictions).length > 0)) {
             resultHtml += `
-                <div class="mt-2">
-                    <small class="text-muted">
-                        <strong>Model details:</strong> 
-                        ${Object.entries(data.model_predictions).map(([model, pred]) => 
-                            `${model}: ${pred === 1 ? 'Recommend' : 'Not recommend'}`
-                        ).join(', ')}
-                    </small>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h6 class="mb-2"><i class="bi bi-gear"></i> Model Analysis Details:</h6>
+                    <div class="row">
+                        ${Object.entries(data.model_predictions).map(([model, pred]) => {
+                            const conf = data.model_confidences && data.model_confidences[model] !== undefined
+                                ? (data.model_confidences[model] * 100).toFixed(1)
+                                : null;
+                            return `
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">${model.replace('_', ' ')}:</span>
+                                    <span>
+                                        <span class="badge ${pred === 1 ? 'bg-success' : 'bg-warning text-dark'} me-2">
+                                            ${pred === 1 ? '✓ Recommend' : '✗ Not Recommend'}
+                                        </span>
+                                        ${conf !== null ? `<span class="badge bg-secondary">${conf}%</span>` : ''}
+                                    </span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
                 </div>
             `;
         }
+        
+        // Add confidence explanation
+        resultHtml += `
+            <div class="mt-3 p-2 bg-info bg-opacity-10 rounded">
+                <small class="text-info">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Confidence Level:</strong> ${confidence}% confidence means our AI is ${confidence >= 80 ? 'very' : confidence >= 60 ? 'moderately' : 'somewhat'} confident in this prediction based on similar review patterns.
+                </small>
+            </div>
+        `;
         
         predictionResult.innerHTML = resultHtml;
         predictionResult.style.display = 'block';
         predictionResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Show toast notification
+        const message = prediction === 1 ? 
+            `AI predicts you'll recommend this product (${confidence}% confidence)` :
+            `AI predicts you won't recommend this product (${confidence}% confidence)`;
+        showToast(message, prediction === 1 ? 'success' : 'warning');
     }
     
     function showPredictionError() {
@@ -367,31 +525,126 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {% block extra_head %}
 <style>
+/* European minimalist black and white theme for add_review page */
 .rating-input .btn {
-    border-radius: 0.375rem;
+    border-radius: 0;
     margin-right: 0.25rem;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
 .rating-input .btn-check:checked + .btn {
     transform: scale(1.05);
 }
 
-.card-header {
-    border-radius: 0.375rem 0.375rem 0 0 !important;
+.form-control {
+    border-radius: 0;
+    font-weight: 400;
+    background-color: #ffffff !important;
+    color: #000000 !important;
 }
 
 .form-control:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    border: 2px solid #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.form-control::placeholder {
+    color: #6c757d !important;
+}
+
+.form-check-input {
+    border-radius: 0;
+}
+
+.form-check-input:checked {
+    background-color: #000000;
+    border-color: #000000;
 }
 
 .alert {
-    border-radius: 0.5rem;
+    border-radius: 0;
+    border: 2px solid #e5e5e5;
 }
 
 .product-badges .badge {
     font-size: 0.75rem;
     margin-left: 0.25rem;
+    border-radius: 0;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* Ensure all text is black on white background */
+.card-body {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.card-body p, .card-body div, .card-body span {
+    color: #000000;
+}
+
+.card-body .text-muted {
+    color: #6c757d !important;
+}
+
+/* Force black text in all form elements */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+textarea, 
+select {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus, 
+input[type="number"]:focus, 
+textarea:focus, 
+select:focus {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+/* Ensure form labels are black */
+.form-label {
+    color: #000000 !important;
+}
+
+/* Ensure all text in the form area is black */
+.border-black {
+    color: #000000 !important;
+}
+
+.border-black * {
+    color: #000000 !important;
+}
+
+.border-black .text-muted {
+    color: #6c757d !important;
+}
+
+/* Override for AI prediction section with black background */
+.border-black .bg-black {
+    color: #ffffff !important;
+}
+
+.border-black .bg-black * {
+    color: #ffffff !important;
+}
+
+.border-black .bg-black .text-white {
+    color: #ffffff !important;
+}
+
+.border-white {
+    color: #ffffff !important;
 }
 
 @media (max-width: 768px) {
@@ -425,10 +678,42 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Character counter styling */
 #charCount.text-danger {
     font-weight: bold;
+    color: #dc3545 !important;
 }
 
 #charCount.text-success {
     font-weight: bold;
+    color: #198754 !important;
+}
+
+/* Button styling */
+.btn-outline-dark {
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+
+.btn-outline-dark:hover {
+    background-color: #000000 !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+.btn-primary {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+
+.btn-primary:hover {
+    background-color: #333333 !important;
+    border-color: #333333 !important;
 }
 </style>
 {% endblock %}
