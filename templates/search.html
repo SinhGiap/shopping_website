@@ -29,6 +29,21 @@
                 <div class="mt-3 mt-md-0">
                     <div class="bg-black text-white px-3 py-2">
                         <span class="fw-bold">{{ total_results }}</span> PRODUCTS FOUND
+                        {% if sort and sort != 'default' %}
+                            <small class="d-block mt-1">
+                                {% if sort == 'rating' %}
+                                    <i class="bi bi-sort-down"></i> Sorted by Highest Rating
+                                {% elif sort == 'newest' %}
+                                    <i class="bi bi-sort-up"></i> Sorted by Lowest Rating
+                                {% elif sort == 'relevance' %}
+                                    <i class="bi bi-fire"></i> Sorted by Popularity
+                                {% endif %}
+                            </small>
+                        {% else %}
+                            <small class="d-block mt-1">
+                                <i class="bi bi-list-ol"></i> Default Order
+                            </small>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -85,14 +100,17 @@
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="btn-group border border-black" role="group">
-                            <input type="radio" class="btn-check" name="sort" id="sort-relevance" value="relevance" {% if (sort or 'relevance') == 'relevance' %}checked{% endif %}>
-                            <label class="btn btn-outline-dark btn-sm" for="sort-relevance">RELEVANCE</label>
+                            <input type="radio" class="btn-check" name="sort" id="sort-default" value="default" {% if not sort or sort == 'default' %}checked{% endif %}>
+                            <label class="btn btn-outline-dark btn-sm" for="sort-default" data-bs-toggle="tooltip" title="Sort by product ID order">DEFAULT</label>
+                            
+                            <input type="radio" class="btn-check" name="sort" id="sort-relevance" value="relevance" {% if sort == 'relevance' %}checked{% endif %}>
+                            <label class="btn btn-outline-dark btn-sm" for="sort-relevance" data-bs-toggle="tooltip" title="Sort by most reviewed products first">POPULAR</label>
                             
                             <input type="radio" class="btn-check" name="sort" id="sort-rating" value="rating" {% if sort == 'rating' %}checked{% endif %}>
-                            <label class="btn btn-outline-dark btn-sm" for="sort-rating">RATING</label>
+                            <label class="btn btn-outline-dark btn-sm" for="sort-rating" data-bs-toggle="tooltip" title="Sort by highest rated products first">POSITIVE</label>
                             
                             <input type="radio" class="btn-check" name="sort" id="sort-newest" value="newest" {% if sort == 'newest' %}checked{% endif %}>
-                            <label class="btn btn-outline-dark btn-sm" for="sort-newest">NEWEST</label>
+                            <label class="btn btn-outline-dark btn-sm" for="sort-newest" data-bs-toggle="tooltip" title="Sort by lowest rated products first">NEGATIVE</label>
                         </div>
                     </div>
                 </div>
@@ -172,7 +190,7 @@
                                             <i class="bi bi-star text-muted"></i>
                                         {% endif %}
                                     {% endfor %}
-                                    <div class="text-muted small">{{ "%.1f"|format(product['Rating']) }} STARS</div>
+                                    <div class="text-muted small">{{ product.get('Review Count', 0) }} REVIEWS</div>
                                 {% else %}
                                     <div class="text-muted small">NO RATING</div>
                                 {% endif %}
@@ -224,7 +242,7 @@
                 <!-- Previous Page -->
                 <li class="page-item {% if not has_prev %}disabled{% endif %}">
                     {% if has_prev %}
-                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=page-1) }}">
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, sort=sort, page=page-1) }}">
                             <i class="bi bi-chevron-left"></i> Previous
                         </a>
                     {% else %}
@@ -240,7 +258,7 @@
                 
                 {% if start_page > 1 %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=1) }}">1</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, sort=sort, page=1) }}">1</a>
                     </li>
                     {% if start_page > 2 %}
                         <li class="page-item disabled">
@@ -251,7 +269,7 @@
                 
                 {% for p in range(start_page, end_page + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=p) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, sort=sort, page=p) }}">{{ p }}</a>
                     </li>
                 {% endfor %}
                 
@@ -262,14 +280,14 @@
                         </li>
                     {% endif %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=total_pages) }}">{{ total_pages }}</a>
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, sort=sort, page=total_pages) }}">{{ total_pages }}</a>
                     </li>
                 {% endif %}
                 
                 <!-- Next Page -->
                 <li class="page-item {% if not has_next %}disabled{% endif %}">
                     {% if has_next %}
-                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, page=page+1) }}">
+                        <a class="page-link" href="{{ url_for('main.search', q=query, division=division, department=department, class=class_name, sort=sort, page=page+1) }}">
                             Next <i class="bi bi-chevron-right"></i>
                         </a>
                     {% else %}
@@ -388,14 +406,24 @@ function clearFilters() {
     document.getElementById('division-filter').value = '';
     document.getElementById('department-filter').value = '';
     document.getElementById('class-filter').value = '';
-    document.getElementById('sort-relevance').checked = true;
+    document.getElementById('sort-default').checked = true;
     
     // Submit the form to show all products
     document.querySelector('form').submit();
 }
 
-// Load dynamic categories from API and populate selects
+// Load dynamic categories and initialize functionality
 document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.querySelector('form');
+    const searchInput = document.getElementById('search-query');
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Load categories from API
     fetch('/api/categories')
         .then(res => res.json())
         .then(data => {
@@ -435,83 +463,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(() => {
             // Ignore and keep defaults
         });
-});
-
-function showSearchTips() {
-    const tipsModal = `
-        <div class="modal fade" id="searchTipsModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bi bi-lightbulb text-warning"></i> Search Tips
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-search text-primary"></i> Search Tips</h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Use specific terms like "cotton dress"</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Try different variations: "dress" or "dresses"</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Search by material: "wool", "cotton", "silk"</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Search by color: "black", "blue", "red"</li>
-                                    <li class="mb-0"><i class="bi bi-check text-success"></i> Search by style: "casual", "formal", "vintage"</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-funnel text-info"></i> Filter Tips</h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Use Collection filter for size ranges</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Use Department for main categories</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Use Product Type for specific items</li>
-                                    <li class="mb-2"><i class="bi bi-check text-success"></i> Combine filters for better results</li>
-                                    <li class="mb-0"><i class="bi bi-check text-success"></i> Sort by rating for quality products</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 p-3 bg-light rounded">
-                            <h6><i class="bi bi-stars text-warning"></i> Popular Searches</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ url_for('main.search', q='dress') }}" class="btn btn-outline-primary btn-sm">Dresses</a>
-                                <a href="{{ url_for('main.search', q='cotton shirt') }}" class="btn btn-outline-primary btn-sm">Cotton Shirts</a>
-                                <a href="{{ url_for('main.search', q='jeans') }}" class="btn btn-outline-primary btn-sm">Jeans</a>
-                                <a href="{{ url_for('main.search', q='sweater') }}" class="btn btn-outline-primary btn-sm">Sweaters</a>
-                                <a href="{{ url_for('main.search', q='jacket') }}" class="btn btn-outline-primary btn-sm">Jackets</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Remove existing modal if any
-    const existingModal = document.getElementById('searchTipsModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // Add new modal
-    document.body.insertAdjacentHTML('beforeend', tipsModal);
-    const modal = new bootstrap.Modal(document.getElementById('searchTipsModal'));
-    modal.show();
-    
-    // Remove modal after it's hidden
-    document.getElementById('searchTipsModal').addEventListener('hidden.bs.modal', function() {
-        this.remove();
-    });
-}
-
-// Enhanced search form functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.querySelector('form');
-    const searchInput = document.getElementById('search-query');
     
     // Add real-time search suggestions (placeholder for future enhancement)
     if (searchInput) {
@@ -565,6 +516,50 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.blur();
         }
     });
+    
+    // Add sorting functionality - FIXED VERSION
+    console.log('Setting up sort functionality...');
+    
+    setTimeout(() => {
+        const sortButtons = document.querySelectorAll('input[name="sort"]');
+        const form = document.querySelector('form[action*="search"]');
+        
+        console.log('Found sort buttons:', sortButtons.length);
+        console.log('Found form:', form);
+        
+        if (form && sortButtons.length > 0) {
+            sortButtons.forEach((button, index) => {
+                console.log(`Setting up button ${index}:`, button.value);
+                
+                button.addEventListener('change', function(e) {
+                    console.log('Change event on button:', this.value, 'checked:', this.checked);
+                    
+                    if (this.checked) {
+                        console.log('Button is checked, submitting form with sort:', this.value);
+                        
+                        // Create a new URL with the updated sort parameter
+                        const formData = new FormData(form);
+                        const url = new URL(form.action, window.location.origin);
+                        
+                        // Add all form data to URL parameters
+                        for (let [key, value] of formData.entries()) {
+                            if (value.trim()) {
+                                url.searchParams.set(key, value);
+                            }
+                        }
+                        
+                        // Force the sort parameter to the clicked button's value
+                        url.searchParams.set('sort', this.value);
+                        
+                        console.log('Navigating to:', url.toString());
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+        } else {
+            console.error('Missing elements - form:', !!form, 'buttons:', sortButtons.length);
+        }
+    }, 500);
     
     // Add search result animations
     const productCards = document.querySelectorAll('.product-card');
@@ -631,13 +626,56 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* Enhanced button styles */
+.btn-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0;
+    width: auto;
+}
+
 .btn-group .btn {
-    border-radius: 0.375rem;
-    margin-right: 0.25rem;
+    border-radius: 0 !important;
+    margin-right: 0 !important;
+    transition: all 0.2s ease;
+    flex: 0 1 auto;
+    white-space: nowrap;
+    border-right: 1px solid var(--bs-border-color);
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.375rem !important;
+    border-bottom-left-radius: 0.375rem !important;
 }
 
 .btn-group .btn:last-child {
-    margin-right: 0;
+    border-top-right-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
+    border-right: none;
+}
+
+.btn-group .btn-check + .btn {
+    position: relative;
+    z-index: 1;
+}
+
+/* Active state styling */
+.btn-check:checked + .btn {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-dark);
+    color: white;
+    transform: scale(1.02);
+}
+
+.btn-check:checked + .btn:hover {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-dark);
+}
+
+/* Hover effects */
+.btn-outline-dark:hover:not(.btn-check:checked + .btn) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Responsive improvements */
@@ -652,11 +690,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     .btn-group {
         width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
     }
     
     .btn-group .btn {
         flex: 1;
         margin-right: 0;
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
     }
     
     .d-flex.gap-2 {
@@ -667,8 +709,6 @@ document.addEventListener('DOMContentLoaded', function() {
     .text-end {
         text-align: start !important;
     }
-    
-    
 }
 
 @media (max-width: 576px) {
@@ -676,9 +716,16 @@ document.addEventListener('DOMContentLoaded', function() {
         margin-bottom: 1rem;
     }
     
+    .btn-group {
+        width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    
     .btn-group .btn {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+        flex: 1;
     }
 }
 </style>

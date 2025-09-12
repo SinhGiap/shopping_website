@@ -466,23 +466,15 @@
     
     // Enhanced search functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Add search suggestions
+        // Enhanced search functionality
         const searchInputs = document.querySelectorAll('input[name="q"]');
         searchInputs.forEach(input => {
-            let searchTimeout;
-            input.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value.trim();
-                
-                if (query.length >= 2) {
-                    searchTimeout = setTimeout(() => {
-                        // Could implement search suggestions here
-                        // For now, just add visual feedback
-                        this.style.borderColor = '#667eea';
-                    }, 300);
-                } else {
-                    this.style.borderColor = '';
-                }
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#667eea';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.borderColor = '';
             });
         });
         

@@ -118,3 +118,25 @@ def get_review_statistics(clothing_id):
         'avg_rating': round(avg_rating, 1),
         'review_count': review_count
     }
+
+def enrich_products_with_review_counts(products):
+    """Add review count to product data"""
+    if not products:
+        return products
+    
+    enriched_products = []
+    for product in products:
+        # Create a copy of the product dict
+        enriched_product = product.copy() if hasattr(product, 'copy') else dict(product)
+        
+        # Get review statistics for this product
+        clothing_id = enriched_product.get('Clothing ID')
+        if clothing_id:
+            stats = get_review_statistics(clothing_id)
+            enriched_product['Review Count'] = stats['review_count']
+        else:
+            enriched_product['Review Count'] = 0
+            
+        enriched_products.append(enriched_product)
+    
+    return enriched_products

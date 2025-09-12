@@ -3,7 +3,7 @@ Product Routes Blueprint
 Handles product-related pages and functionality
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 
 product_bp = Blueprint('product', __name__)
 
@@ -134,3 +134,81 @@ def submit_review():
         print(f"Error submitting review: {e}")
         flash('Error submitting review. Please try again.', 'error')
         return redirect(url_for('main.home'))
+
+@product_bp.route('/api/reviews/<int:clothing_id>')
+def get_product_reviews_api(clothing_id):
+    """API endpoint to get product reviews with pagination"""
+    try:
+        from backend.services.data_manager import get_product_reviews
+        
+        # Get pagination parameters
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+        filter_type = request.args.get('filter', 'all')  # all, recommended, new
+        sort_by = request.args.get('sort', 'newest')  # newest, rating, helpful
+        
+        # Get all reviews for this product
+        all_reviews = get_product_reviews(clothing_id)
+        
+        if not all_reviews:
+            return jsonify({
+                'reviews': [],
+                'total_count': 0,
+                'page': page,
+                'per_page': per_page,
+                'total_pages': 0,
+                'has_more': False
+            })
+        
+        # Apply filtering
+        filtered_reviews = all_reviews
+        if filter_type == 'recommended':
+            filtered_reviews = [r for r in all_reviews if r.get('Recommended IND') == 1]
+        elif filter_type == 'new':
+            filtered_reviews = [r for r in all_reviews if r.get('Is New')]
+        
+        # Apply sorting
+        if sort_by == 'rating':
+            filtered_reviews = sorted(filtered_reviews, key=lambda x: x.get('Rating', 0), reverse=True)
+        elif sort_by == 'helpful':
+            # For now, sort by rating as we don't have helpful votes stored
+            filtered_reviews = sorted(filtered_reviews, key=lambda x: x.get('Rating', 0), reverse=True)
+        else:  # newest
+            # If we have date added, use it; otherwise keep original order
+            if any(r.get('Date Added') for r in filtered_reviews):
+                filtered_reviews = sorted(filtered_reviews, key=lambda x: x.get('Date Added', ''), reverse=True)
+        
+        # Apply pagination
+        total_count = len(filtered_reviews)
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_reviews = filtered_reviews[start_idx:end_idx]
+        
+        total_pages = (total_count + per_page - 1) // per_page
+        has_more = page < total_pages
+        
+        # Format reviews for JSON response
+        formatted_reviews = []
+        for review in paginated_reviews:
+            formatted_reviews.append({
+                'title': review.get('Title', 'Review'),
+                'rating': review.get('Rating', 0),
+                'review_text': review.get('Review Text', ''),
+                'recommended': review.get('Recommended IND', 0),
+                'date_added': review.get('Date Added', ''),
+                'age': review.get('Age', ''),
+                'is_new': review.get('Is New', False)
+            })
+        
+        return jsonify({
+            'reviews': formatted_reviews,
+            'total_count': total_count,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': total_pages,
+            'has_more': has_more
+        })
+        
+    except Exception as e:
+        print(f"Error in get reviews API: {e}")
+        return jsonify({'error': 'Failed to load reviews'}), 500

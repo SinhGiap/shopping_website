@@ -17,7 +17,7 @@
                         Search, explore, and get intelligent predictions for your reviews!
                     </p>
                     
-                    <!-- Enhanced Search Form -->
+                    <!-- Enhanced Search Form
                     <form action="{{ url_for('main.search') }}" method="GET" class="mb-4 scale-in">
                         <div class="row g-2">
                             <div class="col-md-8">
@@ -36,7 +36,7 @@
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form> -->
                     
                     <!-- Quick Category Links -->
                     <div class="d-flex flex-wrap gap-2 mb-4 slide-up">
@@ -132,7 +132,7 @@
                             </div>
                             <h5 class="card-title fw-bold text-dark">ML Predictions</h5>
                             <p class="card-text text-dark">
-                                Get AI-powered predictions on whether you'll recommend a product 
+                                Get ML-powered predictions on whether you'll recommend a product 
                                 based on your review.
                             </p>
                         </div>
@@ -198,7 +198,7 @@
                                                 <i class="bi bi-star text-muted"></i>
                                             {% endif %}
                                         {% endfor %}
-                                        <small class="text-muted ms-1">{{ "%.1f"|format(item['Rating']) }}</small>
+                                        <small class="text-muted ms-1">{{ item.get('Review Count', 0) }} reviews</small>
                                     </div>
                                 </div>
                                 <h6 class="card-title fw-bold text-black" title="{{ item['Clothes Title'].split('(')[0].strip() }}">
@@ -329,7 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check if spinners are still showing (API might have failed)
         if (spinners.length > 0 && spinners[0].style.display !== 'none') {
-            console.log('API seems to be slow, showing fallback stats');
             
             // Hide spinners and show icons
             for (let i = 1; i <= 4; i++) {
@@ -364,34 +363,21 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateX(0)';
         });
     });
-    
-    // Add click tracking for analytics (placeholder)
-    const actionButtons = document.querySelectorAll('a[href*="search"], a[href*="product"]');
-    actionButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Could track user interactions here
-            console.log('User clicked:', this.textContent.trim());
-        });
-    });
-
     // Initialize horizontal carousels
     initCarousels();
 });
 
 function loadStats() {
-    console.log('Loading stats from API...');
     
     // Fetch stats from API endpoint
     fetch('/api/stats')
         .then(response => {
-            console.log('API response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('API data received:', data);
             
             // Hide spinners and show icons
             for (let i = 1; i <= 4; i++) {
@@ -416,8 +402,6 @@ function loadStats() {
             }
         })
         .catch(error => {
-            console.error('Error loading stats:', error);
-            console.log('Using fallback values');
             
             // Hide spinners and show icons
             for (let i = 1; i <= 4; i++) {

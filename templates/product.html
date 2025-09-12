@@ -259,7 +259,7 @@
             </div>
             
             <!-- Reviews List -->
-            <div class="reviews-container" id="reviewsContainer">
+            <div class="reviews-container" id="reviewsContainer" data-clothing-id="{{ product['Clothing ID'] }}">
                 {% for review in reviews[:10] %}
                 <div class="card border-0 shadow-sm mb-3{% if review.get('Is New') %} border-primary{% endif %}">
                     <div class="card-body">
@@ -309,16 +309,7 @@
                         
                         <p class="card-text">{{ review['Review Text'] or 'No review text provided.' }}</p>
                         
-                        <!-- Review Actions -->
-                        <div class="review-actions mt-3 pt-2 border-top">
-                            <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="likeReview(this)">
-                                <i class="bi bi-hand-thumbs-up"></i> Helpful
-                                <span class="count">0</span>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="reportReview(this)">
-                                <i class="bi bi-flag"></i> Report
-                            </button>
-                        </div>
+
                     </div>
                 </div>
                 {% endfor %}
@@ -377,91 +368,151 @@ function shareProduct() {
         navigator.clipboard.writeText(window.location.href).then(function() {
             alert('Product link copied to clipboard!');
         }).catch(function() {
-            // Further fallback: show share modal
-            showShareModal();
+            alert('Unable to copy link. Please copy the URL manually.');
         });
     }
 }
 
-function showShareModal() {
-    // Simple share modal implementation
-    const url = window.location.href;
-    const title = '{{ product["Clothes Title"] or product["Title"] }}';
+
+
+
+
+// Load more reviews functionality
+let currentPage = 1;
+let isLoading = false;
+let currentFilter = 'all';
+let currentSort = 'newest';
+
+function loadMoreReviews() {
+    if (isLoading) return;
     
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Share Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Product URL:</label>
-                        <input type="text" class="form-control" value="${url}" readonly onclick="this.select()">
-                    </div>
-                    <div class="d-grid gap-2">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" 
-                           target="_blank" class="btn btn-primary">
-                            Share on Facebook
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" 
-                           target="_blank" class="btn btn-info text-white">
-                            Share on Twitter
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    isLoading = true;
+    const loadMoreBtn = document.querySelector('button[onclick="loadMoreReviews()"]');
+    const originalText = loadMoreBtn.innerHTML;
     
-    document.body.appendChild(modal);
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
+    loadMoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+    loadMoreBtn.disabled = true;
     
-    modal.addEventListener('hidden.bs.modal', function() {
-        document.body.removeChild(modal);
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const clothingId = reviewsContainer.getAttribute('data-clothing-id');
+    currentPage += 1;
+    
+    fetch(`/api/reviews/${clothingId}?page=${currentPage}&filter=${currentFilter}&sort=${currentSort}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.reviews && data.reviews.length > 0) {
+                appendReviewsToContainer(data.reviews);
+                
+                // Hide load more button if no more reviews
+                if (!data.has_more) {
+                    loadMoreBtn.style.display = 'none';
+                }
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more reviews:', error);
+            alert('Error loading more reviews. Please try again.');
+        })
+        .finally(() => {
+            isLoading = false;
+            loadMoreBtn.innerHTML = originalText;
+            loadMoreBtn.disabled = false;
+        });
+}
+
+function appendReviewsToContainer(reviews) {
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const loadMoreButton = reviewsContainer.querySelector('.text-center');
+    
+    reviews.forEach(review => {
+        const reviewCard = createReviewCard(review);
+        
+        // Insert before the load more button
+        if (loadMoreButton) {
+            reviewsContainer.insertBefore(reviewCard, loadMoreButton);
+        } else {
+            reviewsContainer.appendChild(reviewCard);
+        }
     });
 }
 
-function likeReview(button) {
-    const countSpan = button.querySelector('.count');
-    let count = parseInt(countSpan.textContent);
-    count++;
-    countSpan.textContent = count;
+function createReviewCard(review) {
+    const card = document.createElement('div');
+    card.className = 'card border-0 shadow-sm mb-3' + (review.is_new ? ' border-primary' : '');
     
-    button.classList.remove('btn-outline-primary');
-    button.classList.add('btn-primary');
-    button.disabled = true;
-    
-    // Add visual feedback
-    button.innerHTML = '<i class="bi bi-check"></i> Helpful <span class="count">' + count + '</span>';
-}
-
-function reportReview(button) {
-    if (confirm('Are you sure you want to report this review?')) {
-        button.innerHTML = '<i class="bi bi-check"></i> Reported';
-        button.disabled = true;
-        button.classList.remove('btn-outline-secondary');
-        button.classList.add('btn-warning');
+    // Generate star rating HTML
+    let starsHtml = '';
+    for (let i = 0; i < 5; i++) {
+        if (i < review.rating) {
+            starsHtml += '<i class="bi bi-star-fill text-warning"></i>';
+        } else {
+            starsHtml += '<i class="bi bi-star text-muted"></i>';
+        }
     }
-}
-
-function loadMoreReviews() {
-    // In a real application, this would make an AJAX call to load more reviews
-    alert('Loading more reviews... (Feature not implemented in demo)');
+    
+    // Format date
+    const dateHtml = review.date_added ? `<div>${review.date_added}</div>` : '';
+    const ageHtml = review.age ? `<div>Age ${review.age}</div>` : '';
+    
+    card.innerHTML = `
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h6 class="card-title fw-bold mb-1 text-dark">
+                        ${review.title}
+                        ${review.is_new ? '<span class="badge bg-primary ms-2"><i class="bi bi-star"></i> New Review</span>' : ''}
+                    </h6>
+                    <div class="review-rating">
+                        ${starsHtml}
+                        <span class="ms-2 small text-muted">${review.rating}/5 stars</span>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="d-flex align-items-center mb-1">
+                        ${review.recommended == 1 ? 
+                            '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Recommended</span>' :
+                            '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Not Recommended</span>'
+                        }
+                    </div>
+                    <div class="small text-muted">
+                        ${dateHtml}
+                        ${ageHtml}
+                    </div>
+                </div>
+            </div>
+            
+            <p class="card-text">${review.review_text || 'No review text provided.'}</p>
+        </div>
+    `;
+    
+    // Add animation
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        card.style.transition = 'all 0.3s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+    
+    return card;
 }
 
 // Initialize tooltips and review filtering
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize global variables for review pagination
+    currentPage = 1;
+    currentFilter = 'all';
+    currentSort = 'newest';
+    
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
     
-    // Initialize review filtering
+    // Initialize review filtering with API support
     initializeReviewFiltering();
     
     // Add product image placeholder animation
@@ -474,82 +525,129 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeReviewFiltering() {
     const filterButtons = document.querySelectorAll('input[name="reviewFilter"]');
     const sortButtons = document.querySelectorAll('input[name="sortReviews"]');
-    const reviewsContainer = document.getElementById('reviewsContainer');
     
-    if (!reviewsContainer) return;
-    
-    // Store original reviews HTML
-    const originalReviewsHTML = reviewsContainer.innerHTML;
-    const allReviews = Array.from(reviewsContainer.querySelectorAll('.card'));
-    
-    // Filter functionality
+    // Handle filter changes with API support
     filterButtons.forEach(button => {
         button.addEventListener('change', function() {
-            filterAndSortReviews();
-        });
-    });
-    
-    // Sort functionality
-    sortButtons.forEach(button => {
-        button.addEventListener('change', function() {
-            filterAndSortReviews();
-        });
-    });
-    
-    function filterAndSortReviews() {
-        const selectedFilter = document.querySelector('input[name="reviewFilter"]:checked').value;
-        const selectedSort = document.querySelector('input[name="sortReviews"]:checked').value;
-        
-        let filteredReviews = [...allReviews];
-        
-        // Apply filter
-        if (selectedFilter === 'recommended') {
-            filteredReviews = filteredReviews.filter(card => {
-                const badge = card.querySelector('.badge');
-                return badge && badge.textContent.includes('Recommended');
-            });
-        } else if (selectedFilter === 'new') {
-            filteredReviews = filteredReviews.filter(card => {
-                return card.classList.contains('border-primary');
-            });
-        }
-        
-        // Apply sort
-        filteredReviews.sort((a, b) => {
-            if (selectedSort === 'rating') {
-                const ratingA = parseInt(a.querySelector('.review-rating .small')?.textContent || '0');
-                const ratingB = parseInt(b.querySelector('.review-rating .small')?.textContent || '0');
-                return ratingB - ratingA;
-            } else if (selectedSort === 'helpful') {
-                const helpfulA = parseInt(a.querySelector('.count')?.textContent || '0');
-                const helpfulB = parseInt(b.querySelector('.count')?.textContent || '0');
-                return helpfulB - helpfulA;
-            } else {
-                // Newest first (default order)
-                return 0;
+            if (this.checked) {
+                currentFilter = this.value;
+                currentPage = 1;
+                reloadReviews();
             }
         });
-        
-        // Update display
-        reviewsContainer.innerHTML = '';
-        filteredReviews.forEach((review, index) => {
-            review.style.animationDelay = (index * 0.1) + 's';
-            review.classList.add('fade-in');
-            reviewsContainer.appendChild(review);
+    });
+    
+    // Handle sort changes with API support
+    sortButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            if (this.checked) {
+                currentSort = this.value;
+                currentPage = 1;
+                reloadReviews();
+            }
         });
-        
-        // Show message if no reviews match filter
-        if (filteredReviews.length === 0) {
-            const noResultsMsg = document.createElement('div');
-            noResultsMsg.className = 'text-center py-4';
-            noResultsMsg.innerHTML = `
-                <i class="bi bi-search display-4 text-muted"></i>
-                <h5 class="text-muted mt-2">No reviews match your filter</h5>
-                <p class="text-muted">Try selecting a different filter option.</p>
-            `;
-            reviewsContainer.appendChild(noResultsMsg);
-        }
+    });
+}
+
+function reloadReviews() {
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const clothingId = reviewsContainer.getAttribute('data-clothing-id');
+    const loadMoreButton = reviewsContainer.querySelector('.text-center');
+    
+    // Show loading state
+    const loadingHtml = `
+        <div class="text-center py-4" id="reviewsLoading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading reviews...</p>
+        </div>
+    `;
+    
+    // Clear existing reviews (keep only the first 10 initially shown)
+    const existingReviews = reviewsContainer.querySelectorAll('.card.border-0.shadow-sm.mb-3');
+    const reviewsToKeep = 10;
+    for (let i = reviewsToKeep; i < existingReviews.length; i++) {
+        existingReviews[i].remove();
     }
+    
+    // Add loading indicator
+    if (loadMoreButton) {
+        loadMoreButton.style.display = 'none';
+    }
+    reviewsContainer.insertAdjacentHTML('beforeend', loadingHtml);
+    
+    fetch(`/api/reviews/${clothingId}?page=1&filter=${currentFilter}&sort=${currentSort}&per_page=${reviewsToKeep}`)
+        .then(response => response.json())
+        .then(data => {
+            // Remove loading indicator
+            const loadingEl = document.getElementById('reviewsLoading');
+            if (loadingEl) loadingEl.remove();
+            
+            // Update the first reviews shown
+            const firstReviews = reviewsContainer.querySelectorAll('.card.border-0.shadow-sm.mb-3');
+            firstReviews.forEach(card => card.remove());
+            
+            // Add filtered/sorted reviews
+            if (data.reviews && data.reviews.length > 0) {
+                data.reviews.forEach(review => {
+                    const reviewCard = createReviewCard(review);
+                    reviewsContainer.appendChild(reviewCard);
+                });
+                
+                // Show/hide load more button based on whether there are more reviews
+                if (data.has_more) {
+                    if (loadMoreButton) {
+                        loadMoreButton.style.display = 'block';
+                    } else {
+                        // Create load more button if it doesn't exist
+                        const loadMoreHtml = `
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-outline-primary" onclick="loadMoreReviews()">
+                                    <i class="bi bi-arrow-down-circle"></i> Load More Reviews
+                                </button>
+                            </div>
+                        `;
+                        reviewsContainer.insertAdjacentHTML('beforeend', loadMoreHtml);
+                    }
+                } else if (loadMoreButton) {
+                    loadMoreButton.style.display = 'none';
+                }
+            } else {
+                // No reviews found
+                const noReviewsHtml = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-chat-square-text display-4 text-muted"></i>
+                        <h5 class="mt-3 text-muted">No reviews found</h5>
+                        <p class="text-muted">No reviews match the current filter criteria.</p>
+                    </div>
+                `;
+                reviewsContainer.insertAdjacentHTML('beforeend', noReviewsHtml);
+                
+                if (loadMoreButton) {
+                    loadMoreButton.style.display = 'none';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error reloading reviews:', error);
+            
+            // Remove loading indicator
+            const loadingEl = document.getElementById('reviewsLoading');
+            if (loadingEl) loadingEl.remove();
+            
+            // Show error message
+            const errorHtml = `
+                <div class="alert alert-danger text-center">
+                    <i class="bi bi-exclamation-triangle"></i> Error loading reviews. Please try again.
+                </div>
+            `;
+            reviewsContainer.insertAdjacentHTML('beforeend', errorHtml);
+            
+            if (loadMoreButton) {
+                loadMoreButton.style.display = 'block';
+            }
+        });
 }
 
 function addProductImagePlaceholder() {
@@ -617,10 +715,6 @@ function addScrollToReview() {
 
 .reviews-container .card:hover {
     box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1) !important;
-}
-
-.review-actions .btn {
-    font-size: 0.875rem;
 }
 
 .product-badges .badge {

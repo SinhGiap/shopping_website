@@ -12,7 +12,7 @@ main_bp = Blueprint('main', __name__)
 def home():
     """Enhanced home page with better error handling"""
     try:
-        from backend.services.data_manager import get_search_engine, get_dataframe
+        from backend.services.data_manager import get_search_engine, get_dataframe, enrich_products_with_review_counts
         
         search_engine = get_search_engine()
         df = get_dataframe()
@@ -20,6 +20,9 @@ def home():
         if search_engine and not search_engine.df.empty:
             # Get featured items
             featured_items = search_engine.get_featured_items(Config.FEATURED_ITEMS_LIMIT)
+            
+            # Enrich featured items with review counts
+            featured_items = enrich_products_with_review_counts(featured_items)
             
             # Get categories for navigation
             divisions = sorted(df['Division Name'].dropna().unique())
@@ -52,9 +55,12 @@ def search():
     division = request.args.get('division', '').strip()
     department = request.args.get('department', '').strip()
     class_name = request.args.get('class', '').strip()
-    sort = request.args.get('sort', 'relevance').strip() or 'relevance'
+    sort = request.args.get('sort', 'default').strip() or 'default'
     page = int(request.args.get('page', 1))
     per_page = Config.SEARCH_PER_PAGE
+    
+    # Debug logging
+    print(f"[SEARCH] Query: '{query}', Sort: '{sort}', Page: {page}")
     
     try:
         from backend.services.data_manager import get_search_engine
@@ -75,14 +81,30 @@ def search():
         
         # Apply sorting before pagination
         if not results.empty:
+            print(f"[SEARCH] Applying sort '{sort}' to {len(results)} results")
+            print(f"[SEARCH] Available columns: {list(results.columns)}")
             try:
                 if sort == 'rating' and 'Rating' in results.columns:
+                    # POSITIVE: Sort by highest rating first (descending)
                     results = results.sort_values('Rating', ascending=False)
-                elif sort == 'newest' and 'Clothing ID' in results.columns:
-                    # Proxy for newest, since product records have no timestamp
-                    results = results.sort_values('Clothing ID', ascending=False)
-                # 'relevance' keeps incoming order from search engine
+                    print(f"[SEARCH] Sorted by rating (descending)")
+                elif sort == 'newest' and 'Rating' in results.columns:
+                    # NEGATIVE: Sort by lowest rating first (ascending) 
+                    results = results.sort_values('Rating', ascending=True)
+                    print(f"[SEARCH] Sorted by rating (ascending)")
+                elif sort == 'relevance' and 'Review Count' in results.columns:
+                    # POPULAR: Sort by review count first (most reviews first)
+                    results = results.sort_values('Review Count', ascending=False)
+                    print(f"[SEARCH] Sorted by review count (descending)")
+                elif sort == 'default' and 'Clothing ID' in results.columns:
+                    # DEFAULT: Sort by Clothing ID (product ID order)
+                    results = results.sort_values('Clothing ID', ascending=True)
+                    print(f"[SEARCH] Sorted by Clothing ID (default order)")
+                else:
+                    print(f"[SEARCH] No sorting applied - keeping original order")
+                # Default relevance keeps incoming order from search engine
             except Exception as _sort_err:
+                print(f"[SEARCH] Sort error: {_sort_err}")
                 # Keep original order on sort failure
                 pass
 
@@ -99,13 +121,17 @@ def search():
         end_idx = start_idx + per_page
         paginated_results = results.iloc[start_idx:end_idx]
         
+        # Enrich paginated results with review counts
+        from backend.services.data_manager import enrich_products_with_review_counts
+        enriched_results = enrich_products_with_review_counts(paginated_results.to_dict('records'))
+        
         # Calculate pagination info
         total_pages = max(1, (total_results + per_page - 1) // per_page)
         has_prev = page > 1
         has_next = page < total_pages
         
         return render_template('search.html',
-                             results=paginated_results.to_dict('records'),
+                             results=enriched_results,
                              query=query,
                              total_results=total_results,
                              page=page,
