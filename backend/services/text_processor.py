@@ -12,193 +12,98 @@ class TextProcessor:
         self.lemmatizer = WordNetLemmatizer()
         self.spell = SpellChecker()
         
-        # Cache spell corrections and add performance controls
+        # Spell checking optimization
         self.spell_cache = {}
-        self.spell_check_enabled = False  # Disabled by default for performance
-        self.min_word_length_for_spell_check = 4  # Only check longer words
+        self.spell_check_enabled = True
+        self.min_word_length_for_spell_check = 4
         
         with open(stopwords_path, "r") as s:
             self.stopwords = set(s.read().splitlines())
         
-        # Ensure negators are *not* removed
+        # Keep negators
         self.negators = {"no", "not", "never"}
         self.stopwords = self.stopwords.difference(self.negators)
 
     def preprocess_text(self, texts):
-        """
-        Apply full preprocessing pipeline. If input is a list, apply corpus-wide steps (hapax, top-20 DF, collocations).
-        If input is a single string, skip corpus-wide steps.
-        Returns list of tokenized documents (for list input) or list of tokens (for string input).
-        """
-        single_input = False
-        if isinstance(texts, str):
-            print(f"[DEBUG] preprocess_text called with input: {texts}")
-            if texts is None:
-                print("[ERROR] Input text is None!")
-                return ""
-            single_input = True
+        single_input = isinstance(texts, str)
+        if single_input:
             texts = [texts]
 
-        # 1. Negation handling
+        # Step 1: Negation handling
         texts = [self._handle_negations(str(t)) for t in texts if str(t).strip()]
-        # 2. Tokenization
+
+        # Step 2: Tokenization
         tokenized = [self.tokenizer.tokenize(t) for t in texts]
-        for idx, review in enumerate(tokenized):
-            if review is None:
-                print(f"[ERROR] tokenized[{idx}] is None before len() check!")
-        # 3. Length filtering
-        length_filtered = [[w for w in review if (review is not None and len(w) >= 2) or w in self.negators] for review in tokenized]
-        # 4. Stopword removal
-        stopword_filtered = [[w for w in review if w not in self.stopwords] for review in length_filtered]
+
+        # Step 3: Length filtering
+        tokenized = [
+            [w for w in review if len(w) >= 2 or w in self.negators]
+            for review in tokenized
+        ]
+
+        # Step 4: Stopword removal
+        tokenized = [[w for w in review if w not in self.stopwords] for review in tokenized]
 
         if single_input:
-            all_tokens = stopword_filtered[0] if stopword_filtered else []
-            print(f"[DEBUG] Tokens after stopword removal: {all_tokens}")
-            
-            # ORIGINAL CODE (commented out for performance):
-            # misspelled = self.spell.unknown(all_tokens)
-            # correction_dict = {w: self.spell.correction(w) for w in misspelled if self.spell.correction(w)}
-            # corrected_tokens = [correction_dict.get(token, token) for token in all_tokens]
-            
-            corrected_tokens = self._optimized_spell_check(all_tokens)
-            
-            print(f"[DEBUG] Tokens after spell correction: {corrected_tokens}")
-            lemmatized = [self.lemmatizer.lemmatize(w) for w in corrected_tokens]
-            print(f"[DEBUG] Tokens after lemmatization: {lemmatized}")
-            return lemmatized
-            # Corpus-wide steps
-            # 5. Remove hapax (words that appear only once across corpus)
-            all_tokens = list(chain.from_iterable(stopword_filtered))
-            tf = Counter(all_tokens)
-            hapax = {w for w, c in tf.items() if c == 1}
-            no_hapax_reviews = [[w for w in review if w not in hapax] for review in stopword_filtered]
+            # For single text, skip corpus-wide steps
+            tokens = tokenized[0] if tokenized else []
+            tokens = self._optimized_spell_check(tokens)
+            tokens = [self.lemmatizer.lemmatize(w) for w in tokens]
+            return tokens
 
-            # 6. Spell checking and correction
-            all_tokens = [token for review in no_hapax_reviews for token in review]
-            
-            # ORIGINAL CODE (commented out for performance):
-            # misspelled = self.spell.unknown(all_tokens)
-            # correction_dict = {w: self.spell.correction(w) for w in misspelled if self.spell.correction(w)}
-            # corrected_tokens = [correction_dict.get(token, token) for token in all_tokens]
-            
-            corrected_tokens = self._optimized_spell_check(all_tokens)
+        # Corpus-wide steps
+        return self._process_corpus(tokenized)
 
-            # Restore structure
-            corrected_reviews = []
-            idx = 0
-            for idx2, review in enumerate(no_hapax_reviews):
-                if review is None:
-                    print(f"[ERROR] no_hapax_reviews[{idx2}] is None before len() check!")
-                length = len(review) if review is not None else 0
-                corrected_reviews.append(corrected_tokens[idx:idx+length])
-                idx += length
+    def _process_corpus(self, tokenized_reviews):
+        # Remove hapax words
+        all_tokens = list(chain.from_iterable(tokenized_reviews))
+        tf = Counter(all_tokens)
+        hapax = {w for w, c in tf.items() if c == 1}
+        reviews_no_hapax = [[w for w in review if w not in hapax] for review in tokenized_reviews]
 
-            # 7. Lemmatization
-            lemmatized_reviews = [[self.lemmatizer.lemmatize(w) for w in review] for review in corrected_reviews]
+        # Spell correction
+        all_tokens = list(chain.from_iterable(reviews_no_hapax))
+        corrected_tokens = self._optimized_spell_check(all_tokens)
 
-            # 8. Remove top 20 most frequent words (by document frequency)
-            df_counter = Counter()
-            for review in lemmatized_reviews:
-                df_counter.update(set(review))
-            top20_df_words = {w for w, _ in df_counter.most_common(20)}
-            df_filtered_reviews = [[w for w in review if w not in top20_df_words] for review in lemmatized_reviews]
+        # Restore structure
+        reviews_corrected = []
+        idx = 0
+        for review in reviews_no_hapax:
+            length = len(review)
+            reviews_corrected.append(corrected_tokens[idx:idx+length])
+            idx += length
 
-            # 9. Collocation extraction (merge frequent bigrams)
-            all_tokens = list(chain.from_iterable(df_filtered_reviews))
-            bigram_finder = BigramCollocationFinder.from_words(all_tokens)
-            bigram_finder.apply_freq_filter(3)
-            frequent_bigrams = set(bigram_finder.ngram_fd.keys())
+        # Lemmatization
+        reviews_lemmatized = [[self.lemmatizer.lemmatize(w) for w in review] for review in reviews_corrected]
 
-            def merge_bigrams(review, bigrams_set):
-                merged = []
-                i = 0
-                while i < len(review):
-                    if i < len(review) - 1 and (review[i], review[i + 1]) in bigrams_set:
-                        merged.append(f"{review[i]}_{review[i + 1]}")
-                        i += 2
-                    else:
-                        merged.append(review[i])
-                        i += 1
-                return merged
+        # Remove top 20 most frequent words by document frequency
+        df_counter = Counter()
+        for review in reviews_lemmatized:
+            df_counter.update(set(review))
+        top20_df_words = {w for w, _ in df_counter.most_common(20)}
+        reviews_df_filtered = [[w for w in review if w not in top20_df_words] for review in reviews_lemmatized]
 
-            collocation_reviews = [merge_bigrams(review, frequent_bigrams) for review in df_filtered_reviews]
-            return collocation_reviews
-            all_tokens = list(chain.from_iterable(stopword_filtered))
-            tf = Counter(all_tokens)
-            hapax = {w for w, c in tf.items() if c == 1}
-            no_hapax_reviews = [[w for w in review if w not in hapax] 
-                                for review in stopword_filtered]
+        # Collocation extraction (merge frequent bigrams)
+        all_tokens = list(chain.from_iterable(reviews_df_filtered))
+        bigram_finder = BigramCollocationFinder.from_words(all_tokens)
+        bigram_finder.apply_freq_filter(3)
+        frequent_bigrams = set(bigram_finder.ngram_fd.keys())
 
-            # 7. Spell checking and correction
-            all_tokens = [token for review in no_hapax_reviews for token in review]
-            
-            # ORIGINAL one (commented out for performance):
-            # misspelled = self.spell.unknown(all_tokens)
-            # correction_dict = {w: self.spell.correction(w) for w in misspelled if self.spell.correction(w)}
-            # corrected_tokens = [correction_dict.get(token, token) for token in all_tokens]
-            
-            corrected_tokens = self._optimized_spell_check(all_tokens)
+        def merge_bigrams(review):
+            merged = []
+            i = 0
+            while i < len(review):
+                if i < len(review) - 1 and (review[i], review[i+1]) in frequent_bigrams:
+                    merged.append(f"{review[i]}_{review[i+1]}")
+                    i += 2
+                else:
+                    merged.append(review[i])
+                    i += 1
+            return merged
 
-            # Restore structure
-            corrected_reviews = []
-            idx = 0
-            for review in no_hapax_reviews:
-                length = len(review)
-                corrected_reviews.append(corrected_tokens[idx:idx+length])
-                idx += length
-
-            # 8. Lemmatization
-            lemmatized_reviews = [[self.lemmatizer.lemmatize(w) for w in review] 
-                                  for review in corrected_reviews]
-
-            # 9. Remove top 20 most frequent words (by document frequency)
-            df_counter = Counter()
-            for review in lemmatized_reviews:
-                df_counter.update(set(review))
-            top20_df_words = {w for w, _ in df_counter.most_common(20)}
-            df_filtered_reviews = [[w for w in review if w not in top20_df_words] 
-                                   for review in lemmatized_reviews]
-
-            # 10. Collocation extraction (merge frequent bigrams)
-            all_tokens = list(chain.from_iterable(df_filtered_reviews))
-            bigram_finder = BigramCollocationFinder.from_words(all_tokens)
-            bigram_finder.apply_freq_filter(3)
-            frequent_bigrams = set(bigram_finder.ngram_fd.keys())
-
-            def merge_bigrams(review, bigrams_set):
-                merged = []
-                i = 0
-                while i < len(review):
-                    if i < len(review) - 1 and (review[i], review[i + 1]) in bigrams_set:
-                        merged.append(f"{review[i]}_{review[i + 1]}")
-                        i += 2
-                    else:
-                        merged.append(review[i])
-                        i += 1
-                return merged
-
-            collocation_reviews = [merge_bigrams(review, frequent_bigrams) 
-                                   for review in df_filtered_reviews]
-            return collocation_reviews
-        else:
-            # Single review: skip corpus-wide steps
-            # 7. Spell checking and correction
-            all_tokens = [token for review in stopword_filtered for token in review]
-            
-            # ORIGINAL CODE (commented out for performance):
-            # misspelled = self.spell.unknown(all_tokens)
-            # correction_dict = {w: self.spell.correction(w) for w in misspelled if self.spell.correction(w)}
-            # corrected_tokens = [correction_dict.get(token, token) for token in all_tokens]
-            
-            corrected_tokens = self._optimized_spell_check(all_tokens)
-           
-            
-            # Lemmatization
-            lemmatized = [self.lemmatizer.lemmatize(w) for w in corrected_tokens]
-            return lemmatized
+        return [merge_bigrams(review) for review in reviews_df_filtered]
 
     def _handle_negations(self, text):
-        """Expand common negations and contractions"""
         negation_patterns = {
             "don't": "do not",
             "doesn't": "does not",
@@ -216,39 +121,27 @@ class TextProcessor:
             "hasn't": "has not",
             "hadn't": "had not"
         }
-
         for contraction, expansion in negation_patterns.items():
             text = text.replace(contraction, expansion)
             text = text.replace(contraction.title(), expansion.title())
         return text
-    
-    # NEW OPTIMIZED SPELL CHECKING METHOD 
+
     def _optimized_spell_check(self, tokens):
-        """
-        Optimized spell checking with caching and length filtering
-        PERFORMANCE IMPROVEMENT: Much faster than original spell checking
-        """
         if not self.spell_check_enabled:
-            return tokens  # Skip spell checking when disabled
-            
+            return tokens
+
         corrected = []
         for token in tokens:
-            # Skip short words, numbers, and already cached words
             if len(token) < self.min_word_length_for_spell_check:
                 corrected.append(token)
                 continue
-                
-            # Check cache first (PERFORMANCE BOOST)
             if token in self.spell_cache:
                 corrected.append(self.spell_cache[token])
                 continue
-            
-            # Only spell check if word is unknown and not too short
             if token in self.spell:
-                corrected.append(token)
                 self.spell_cache[token] = token
+                corrected.append(token)
             else:
-                # Get correction but limit to reasonable candidates
                 correction = self.spell.correction(token)
                 if correction and correction != token and len(correction) > 2:
                     self.spell_cache[token] = correction
@@ -256,16 +149,8 @@ class TextProcessor:
                 else:
                     self.spell_cache[token] = token
                     corrected.append(token)
-        
         return corrected
-    
 
-    
     def enable_spell_checking(self, enabled=True):
-        """Enable or disable spell checking for better performance control"""
         self.spell_check_enabled = enabled
-        if not enabled:
-            print("[INFO] Spell checking disabled for better performance")
-        else:
-            print("[INFO] Spell checking enabled")
-    
+        print("[INFO] Spell checking " + ("enabled" if enabled else "disabled"))

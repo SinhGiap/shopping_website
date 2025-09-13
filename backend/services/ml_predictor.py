@@ -202,4 +202,3 @@ class MLPredictor:
                 'error': str(e),
                 'status': 'error'
             }
-            struct_df = self.df[["Rating", "Division Name", "Department Name", "Class Name"]].copy()
