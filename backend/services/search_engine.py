@@ -165,7 +165,7 @@ class SearchEngine:
             df_subset_sorted = df_subset
         
         # Group by Clothing ID and aggregate data - focus on product info only
-        unique_products = df_subset_sorted.groupby('Clothing ID').agg({
+        agg_dict = {
             'Clothes Title': 'first',        # Product name
             'Clothes Description': 'first',  # Product description
             'Class Name': 'first',           # Product category
@@ -173,8 +173,13 @@ class SearchEngine:
             'Division Name': 'first',        # Division
             'Rating': 'mean',                # Average rating across all reviews
             'Recommended IND': 'mean',       # Percentage recommended
-            'search_score': 'first' if has_scores else lambda x: None  # Preserve search score
-        }).round({'Rating': 1, 'Recommended IND': 2})
+        }
+        
+        # Only add search_score to aggregation if it exists
+        if has_scores:
+            agg_dict['search_score'] = 'first'
+            
+        unique_products = df_subset_sorted.groupby('Clothing ID').agg(agg_dict).round({'Rating': 1, 'Recommended IND': 2})
         
         # Reset index to make Clothing ID a column again
         unique_products = unique_products.reset_index()
