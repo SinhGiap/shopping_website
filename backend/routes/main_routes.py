@@ -55,12 +55,8 @@ def search():
     division = request.args.get('division', '').strip()
     department = request.args.get('department', '').strip()
     class_name = request.args.get('class', '').strip()
-    sort = request.args.get('sort', 'default').strip() or 'default'
     page = int(request.args.get('page', 1))
     per_page = Config.SEARCH_PER_PAGE
-    
-    # Debug logging
-    print(f"[SEARCH] Query: '{query}', Sort: '{sort}', Page: {page}")
     
     try:
         from backend.services.data_manager import get_search_engine
@@ -73,40 +69,13 @@ def search():
                                  page=1, total_pages=0, has_prev=False, has_next=False,
                                  error="Search functionality temporarily unavailable")
         
-        # Perform search
+        # Perform search - results come in natural priority order (exact matches first)
         if query:
             results = search_engine.fuzzy_search(query, limit=1000)
         else:
             results = search_engine.filter_by_category(division, department, class_name, limit=1000)
         
-        # Apply sorting before pagination
-        if not results.empty:
-            print(f"[SEARCH] Applying sort '{sort}' to {len(results)} results")
-            print(f"[SEARCH] Available columns: {list(results.columns)}")
-            try:
-                if sort == 'rating' and 'Rating' in results.columns:
-                    # POSITIVE: Sort by highest rating first (descending)
-                    results = results.sort_values('Rating', ascending=False)
-                    print(f"[SEARCH] Sorted by rating (descending)")
-                elif sort == 'newest' and 'Rating' in results.columns:
-                    # NEGATIVE: Sort by lowest rating first (ascending) 
-                    results = results.sort_values('Rating', ascending=True)
-                    print(f"[SEARCH] Sorted by rating (ascending)")
-                elif sort == 'relevance' and 'Review Count' in results.columns:
-                    # POPULAR: Sort by review count first (most reviews first)
-                    results = results.sort_values('Review Count', ascending=False)
-                    print(f"[SEARCH] Sorted by review count (descending)")
-                elif sort == 'default' and 'Clothing ID' in results.columns:
-                    # DEFAULT: Sort by Clothing ID (product ID order)
-                    results = results.sort_values('Clothing ID', ascending=True)
-                    print(f"[SEARCH] Sorted by Clothing ID (default order)")
-                else:
-                    print(f"[SEARCH] No sorting applied - keeping original order")
-                # Default relevance keeps incoming order from search engine
-            except Exception as _sort_err:
-                print(f"[SEARCH] Sort error: {_sort_err}")
-                # Keep original order on sort failure
-                pass
+        print(f"[SEARCH] Found {len(results)} results in natural priority order")
 
         # Handle empty results after sorting
         if results.empty:
@@ -140,8 +109,7 @@ def search():
                              has_next=has_next,
                              division=division,
                              department=department,
-                             class_name=class_name,
-                             sort=sort)
+                             class_name=class_name)
         
     except Exception as e:
         print(f"Error in search route: {e}")

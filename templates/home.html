@@ -191,14 +191,17 @@
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <span class="badge bg-black text-white">{{ item['Class Name']|upper }}</span>
                                     <div class="rating text-nowrap">
+                                        {% set rating = item['Rating'] %}
                                         {% for i in range(5) %}
-                                            {% if i < item['Rating'] %}
+                                            {% if i < rating|int %}
                                                 <i class="bi bi-star-fill text-black"></i>
+                                            {% elif i < rating and (rating - i) >= 0.5 %}
+                                                <i class="bi bi-star-half text-black"></i>
                                             {% else %}
                                                 <i class="bi bi-star text-muted"></i>
                                             {% endif %}
                                         {% endfor %}
-                                        <small class="text-muted ms-1">{{ item.get('Review Count', 0) }} reviews</small>
+                                        <small class="text-muted ms-1">({{ item.get('Review Count', 0) }} reviews)</small>
                                     </div>
                                 </div>
                                 <h6 class="card-title fw-bold text-black" title="{{ item['Clothes Title'].split('(')[0].strip() }}">

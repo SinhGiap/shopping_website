@@ -57,12 +57,17 @@ class SearchEngine:
                     
                 field_text = str(row[field]).lower()
                 
-                # Direct substring match (highest score)
-                if query in field_text:
-                    score += weight * 10
+                # HIGHEST PRIORITY: Exact word-by-word match (case insensitive)
+                if query == field_text:
+                    score += weight * 1000  # Extremely high score for exact matches
                     continue
                 
-                # Token-based matching
+                # HIGH PRIORITY: Direct substring match
+                elif query in field_text:
+                    score += weight * 100
+                    continue
+                
+                # Token-based matching for partial matches
                 try:
                     field_tokens = self.tokenizer.tokenize(field_text)
                     field_tokens = [self.lemmatizer.lemmatize(token) for token in field_tokens]
@@ -71,17 +76,33 @@ class SearchEngine:
                 
                 # Calculate match score for this field
                 field_score = 0
+                total_query_tokens = len(query_tokens)
+                matched_tokens = 0
+                
                 for query_token in query_tokens:
                     # Exact token match
                     if query_token in field_tokens:
-                        field_score += 3
+                        field_score += 10
+                        matched_tokens += 1
                     # Partial match
                     elif any(query_token in token or token in query_token 
                            for token in field_tokens if len(token) > 2):
-                        field_score += 2
+                        field_score += 5
+                        matched_tokens += 0.5
                     # Fuzzy match for common variations
                     elif self._fuzzy_match(query_token, field_tokens):
-                        field_score += 1
+                        field_score += 2
+                        matched_tokens += 0.3
+                
+                # Boost score if most/all query tokens are matched
+                if total_query_tokens > 0:
+                    match_ratio = matched_tokens / total_query_tokens
+                    if match_ratio >= 1.0:  # All tokens matched exactly
+                        field_score *= 3
+                    elif match_ratio >= 0.8:  # Most tokens matched
+                        field_score *= 2
+                    elif match_ratio >= 0.5:  # Half tokens matched
+                        field_score *= 1.5
                 
                 score += field_score * weight
             
@@ -99,7 +120,11 @@ class SearchEngine:
         result_indices = [idx for idx, score in sorted_products[:limit]]
         matched_reviews = self.df.loc[result_indices].copy()
         
-        # Return unique products with aggregated data
+        # Add search scores to the dataframe to preserve ordering
+        score_map = {idx: score for idx, score in sorted_products[:limit]}
+        matched_reviews['search_score'] = matched_reviews.index.map(score_map)
+        
+        # Return unique products with aggregated data, preserving score order
         return self._get_unique_products(matched_reviews)
     
     def _fuzzy_match(self, query_token, field_tokens):
@@ -125,19 +150,30 @@ class SearchEngine:
         return False
     
     def _get_unique_products(self, df_subset):
-        """Convert reviews dataframe to unique products with aggregated data"""
+        """Convert reviews dataframe to unique products with aggregated data, preserving score order"""
         if df_subset.empty:
             return pd.DataFrame()
         
+        # If search scores exist, preserve the highest scoring review per product for ordering
+        has_scores = 'search_score' in df_subset.columns
+        if has_scores:
+            # For each Clothing ID, keep the review with the highest search score
+            best_reviews = df_subset.loc[df_subset.groupby('Clothing ID')['search_score'].idxmax()]
+            # Sort by search score to maintain ordering
+            df_subset_sorted = best_reviews.sort_values('search_score', ascending=False)
+        else:
+            df_subset_sorted = df_subset
+        
         # Group by Clothing ID and aggregate data - focus on product info only
-        unique_products = df_subset.groupby('Clothing ID').agg({
+        unique_products = df_subset_sorted.groupby('Clothing ID').agg({
             'Clothes Title': 'first',        # Product name
             'Clothes Description': 'first',  # Product description
             'Class Name': 'first',           # Product category
             'Department Name': 'first',      # Department
             'Division Name': 'first',        # Division
             'Rating': 'mean',                # Average rating across all reviews
-            'Recommended IND': 'mean'        # Percentage recommended
+            'Recommended IND': 'mean',       # Percentage recommended
+            'search_score': 'first' if has_scores else lambda x: None  # Preserve search score
         }).round({'Rating': 1, 'Recommended IND': 2})
         
         # Reset index to make Clothing ID a column again
@@ -149,6 +185,10 @@ class SearchEngine:
         
         # Handle duplicate product names by adding unique identifiers
         unique_products = self._handle_duplicate_names(unique_products)
+        
+        # If we have scores, maintain the score-based ordering
+        if has_scores:
+            unique_products = unique_products.sort_values('search_score', ascending=False)
         
         return unique_products
     
