@@ -1,5 +1,8 @@
 # Enhanced Shopping Website 
 
+### DEMO VIDEO ONEDRIVE LINK
+ https://rmiteduau.sharepoint.com/:v:/s/ItNguyenSinhGiap/ETLNPrCLFWxKu2Rvv-fWO5cBgXkWV7DaJ2v_lJmEfShQWQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=WdenY1
+
 Core Dependencies
 - **Flask 3.1.2**: Modern web framework with latest security updates
 - **pandas 2.3.1**: Advanced data manipulation and analysis
