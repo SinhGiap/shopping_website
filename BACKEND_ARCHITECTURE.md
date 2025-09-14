@@ -1,7 +1,11 @@
 # Backend Architecture Documentation
 
-## Overview
-The shopping website has been restructured into a professional backend architecture with proper separation of concerns and modular design.
+
+## Current Status
+ **Search Functionality**: Fully operational with exact match priority and score-based ordering  
+ **ML Prediction Service**: Complete with ensemble models and fallback mechanisms  
+ **Error Handling**: Comprehensive error handling with graceful degradation  
+ **Performance**: Optimized search engine with intelligent caching and preprocessing
 
 ## Directory Structure
 
@@ -36,7 +40,6 @@ shopping_website/
 └── assignment3_II.csv        # Dataset
 ```
 
-## Key Improvements
 
 ### 1. Modular Architecture
 - **Separation of Concerns**: Each component has a single responsibility
@@ -55,20 +58,27 @@ shopping_website/
 
 ### 4. Service Organization
 
-#### Text Processing Service (`text_processor.py`)
-- Handles NLTK setup and text preprocessing
-- Tokenization, lemmatization, stopword removal
-- Reusable across different components
+#### Text Processing Service (`text_processor.py`) - 
+- **Advanced preprocessing**: Complete NLTK pipeline with negation handling
+- **Performance tuned**: Optimized spell checking with caching and length filtering
+- **Configurable**: Spell checking can be enabled/disabled for performance control
+- **Robust error handling**: Safe processing of malformed text inputs
+- **Lemmatization & tokenization**: Professional-grade text normalization
 
-#### ML Prediction Service (`ml_predictor.py`)
-- Manages ML model loading and training
-- BoW and Title+Structured feature models
-- Ensemble prediction with confidence scores
+#### ML Prediction Service (`ml_predictor.py`) - 
+- **Model management**: Automatic loading with version compatibility warnings
+- **Ensemble predictions**: Combines LogisticRegression, AdaBoost, and XGBoost models
+- **Feature engineering**: BoW vectorization + structured features (rating, division, etc.)
+- **Fallback mechanisms**: Graceful degradation when models unavailable
+- **Performance optimized**: Cached models with efficient prediction pipeline
 
-#### Search Engine Service (`search_engine.py`)
-- Fuzzy search functionality
-- Category filtering
-- Product deduplication and aggregation
+#### Search Engine Service (`search_engine.py`) - 
+- **Advanced fuzzy search**: Multi-tier priority scoring system
+- **Exact match priority**: Exact matches receive 10000+ points for top ranking
+- **Score preservation**: Fixed unique product aggregation to maintain search relevance
+- **Category filtering**: Comprehensive filtering by division, department, class
+- **Product deduplication**: Intelligent aggregation with review count and rating averages
+- **Performance optimized**: Efficient search algorithms with proper error handling
 
 #### Data Manager Service (`data_manager.py`)
 - Centralized service initialization
@@ -92,38 +102,24 @@ shopping_website/
 - Category data API
 - RESTful endpoints
 
-## Benefits
+## Recent Fixes & Improvements
 
-1. **Maintainability**: Code is organized and easy to understand
-2. **Scalability**: Easy to add new features without breaking existing code
-3. **Testability**: Each component can be tested independently
-4. **Reusability**: Services can be reused across different parts of the application
-5. **Professional**: Follows industry best practices and patterns
+### Search Functionality Resolution 
+- **Issue**: "Column(s) ['search_score'] do not exist" error in search operations
+- **Root Cause**: Conditional aggregation in `_get_unique_products` method failed when search_score column was missing
+- **Solution**: Implemented dynamic aggregation dictionary that only includes search_score when available
+- **Result**: Search now works flawlessly for all query types (empty, keyword, category filtering)
 
-## Usage
+### Performance Optimizations 
+- **Text Processing**: Implemented optimized spell checking with caching
+- **Search Engine**: Added intelligent score preservation during product aggregation  
+- **ML Models**: Enhanced model loading with better error handling
+- **Memory Usage**: Optimized data processing to reduce memory footprint
 
-### Running the Application
-```bash
-python app.py
-```
+### Error Handling Improvements 
+- **Graceful Degradation**: All services now handle missing dependencies gracefully
+- **Comprehensive Logging**: Detailed error logging for debugging and monitoring
+- **User-Friendly Messages**: Clear error messages for end users
+- **Fallback Mechanisms**: Robust fallbacks ensure application continues working
 
-### Development
-- Modify services in `backend/services/`
-- Add new routes in `backend/routes/`
-- Update configuration in `backend/config/settings.py`
 
-### Adding New Features
-1. Create service classes in `backend/services/`
-2. Add routes in appropriate blueprint files
-3. Update `app_factory.py` to register new blueprints
-4. Add configuration settings if needed
-
-## Migration Notes
-
-The original `app.py` has been backed up as `app_old.py`. All functionality remains the same, but the code is now:
-- More organized and maintainable
-- Easier to extend and modify
-- Following professional development practices
-- Better separated for testing and debugging
-
-The API endpoints remain unchanged, ensuring backward compatibility with any existing integrations.

@@ -9,7 +9,7 @@ product_bp = Blueprint('product', __name__)
 
 @product_bp.route('/product/<int:clothing_id>')
 def product_detail(clothing_id):
-    """Enhanced product detail page with new review support"""
+    """ product detail page with new review support"""
     try:
         from backend.services.data_manager import get_dataframe, get_product_reviews, get_review_statistics
         
@@ -72,7 +72,7 @@ def add_review_form(clothing_id):
 
 @product_bp.route('/submit_review', methods=['POST'])
 def submit_review():
-    """Enhanced review submission"""
+    """ review submission"""
     try:
         clothing_id = int(request.form['clothing_id'])
         title = str(request.form['title']).strip()

@@ -10,7 +10,7 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def home():
-    """Enhanced home page with better error handling"""
+    """ home page with better error handling"""
     try:
         from backend.services.data_manager import get_search_engine, get_dataframe, enrich_products_with_review_counts
         
@@ -50,7 +50,7 @@ def home():
 
 @main_bp.route('/search')
 def search():
-    """Enhanced search page with better pagination and error handling"""
+    """ search page with better pagination and error handling"""
     query = request.args.get('q', '').strip()
     division = request.args.get('division', '').strip()
     department = request.args.get('department', '').strip()

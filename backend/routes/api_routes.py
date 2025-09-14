@@ -9,7 +9,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.route('/predict_recommendation', methods=['POST'])
 def predict_recommendation():
-    """Enhanced API endpoint for ML prediction"""
+    """ API endpoint for ML prediction"""
     try:
         from backend.services.data_manager import get_ml_predictor, get_dataframe
         

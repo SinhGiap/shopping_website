@@ -71,11 +71,11 @@ def add_new_review(clothing_id, title, review_text, rating, recommended, age=Non
             'Rating': rating,
             'Recommended IND': recommended,
             'Positive Feedback Count': 0,  # Default value
-            'Division Name': '',  # Will be filled from existing product data
-            'Department Name': '',  # Will be filled from existing product data
-            'Class Name': '',  # Will be filled from existing product data
-            'Clothes Title': '',  # Will be filled from existing product data
-            'Clothes Description': ''  # Will be filled from existing product data
+            'Division Name': '',  
+            'Department Name': '',  
+            'Class Name': '',  
+            'Clothes Title': '',  
+            'Clothes Description': ''  
         }
         
         # Get product details from existing data to fill missing fields

@@ -1,7 +1,6 @@
 """
-Enhanced Milestone II: Flask Shopping Website
-A comprehensive online shopping website with ML-powered review prediction
-Professional backend architecture with modular design
+ Flask Shopping Website
+    Main Application Entry Point
 """
 
 import os

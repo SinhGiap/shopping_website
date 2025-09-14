@@ -1,6 +1,6 @@
 """
 Search Engine Service
-Enhanced search functionality with improved fuzzy matching
+ search functionality with improved fuzzy matching
 """
 
 import pandas as pd
@@ -10,7 +10,7 @@ from nltk.stem import WordNetLemmatizer
 from backend.config.settings import Config
 
 class SearchEngine:
-    """Enhanced search functionality with improved fuzzy matching"""
+    """ search functionality with improved fuzzy matching"""
     
     def __init__(self, df):
         self.df = df if df is not None else pd.DataFrame()
@@ -18,7 +18,7 @@ class SearchEngine:
         self.tokenizer = RegexpTokenizer(r"[a-zA-Z]+(?:[-'][a-zA-Z]+)?")
         
     def fuzzy_search(self, query, limit=None):
-        """Enhanced search with better fuzzy matching - returns unique products"""
+        """ search with better fuzzy matching - returns unique products"""
         if limit is None:
             limit = Config.SEARCH_LIMIT
             

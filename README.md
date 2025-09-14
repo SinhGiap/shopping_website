@@ -1,61 +1,61 @@
-# Enhanced Shopping Website - Milestone II
+# Enhanced Shopping Website 
 
-A comprehensive Flask-based online shopping website with machine learning-powered review prediction capabilities.
+Core Dependencies
+- **Flask 3.1.2**: Modern web framework with latest security updates
+- **pandas 2.3.1**: Advanced data manipulation and analysis
+- **scikit-learn 1.7.1**: Machine learning library with latest algorithms
+- **nltk 3.9.1**: Natural language processing toolkit
+- **xgboost 3.0.5**: Gradient boosting framework for ML ensemble
 
-## 🌟 Features
+### Frontend Stack
+- **Bootstrap 5.1.3**: Responsive CSS framework with modern components
+- **Bootstrap Icons**: Comprehensive icon library for consistent UI
+- **Vanilla JavaScript ES6+**: Modern JavaScript without external dependencies
+- **CSS Custom Properties**: Dynamic theming and responsive design
 
-### Core Functionality
-- **Smart Product Search**: Advanced fuzzy search with intelligent matching
-- **ML-Powered Predictions**: AI-driven review recommendation predictions
-- **Responsive Design**: Mobile-first Bootstrap 5 responsive interface
-- **Product Catalog**: Browse products by categories, departments, and classes
-- **Review System**: Write and read customer reviews with ML predictions
+### Development Tools
+- **requirements_freeze.txt**: Complete environment snapshot with 55+ packages
+- **Debug Mode**: Enhanced error reporting and development features
+- **Health Monitoring**: Built-in system health and performance monitoring
 
-### Machine Learning Integration
-- **Bag-of-Words Model**: Text analysis using Milestone I preprocessing pipeline
-- **Ensemble Predictions**: Multiple model combination for better accuracy
-- **Real-time Predictions**: Instant ML predictions for new reviews
-- **Confidence Scoring**: Prediction confidence levels
+##  Quick Start Guide# 
 
-### Technical Features
-- **Enhanced Error Handling**: Robust fallback mechanisms
-- **Smart Fallbacks**: Graceful degradation when ML models unavailable
-- **Modern UI/UX**: Professional design with smooth animations
-- **RESTful API**: JSON endpoints for ML predictions
-- **Pagination**: Efficient handling of large product catalogs
-
-## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+ (recommend 3.9)
-- pip package manager
+- **Python 3.8+** (Python 3.9+ recommended for optimal performance)
+- **pip package manager** (latest version recommended)
+- **4GB RAM minimum** (8GB recommended for ML model operations)
 
-### Installation
+### Installation Steps
 
-1. **Clone or navigate to the project directory**
+1. **Navigate to project directory**
    ```bash
    cd shopping_website
    ```
 
-2. **Install dependencies**
+2. **Install dependencies** (Choose one option):
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements_freeze.txt
    ```
 
-3. **Ensure dataset is available**
-   - Place `assignment3_II.csv` in the project root or parent directory
-   - The app will automatically search multiple locations
+3. **Verify dataset availability**
+   - Ensure `assignment3_II.csv` is present in project root
+   - Application auto-detects dataset location with fallback mechanisms
 
-4. **Run the application**
+4. **Launch the application**
    ```bash
    python app.py
    ```
 
-5. **Access the website**
-   - Open your browser to: http://127.0.0.1:5002
-   - The enhanced shopping website will be available
+5. **Access the enhanced platform**
+   - **Main Application**: http://127.0.0.1:5002
+   - **Admin Dashboard**: http://127.0.0.1:5002/admin  
+   - **Health Check**: http://127.0.0.1:5002/health
+   - **API Documentation**: Available through /api/ endpoints
 
-## 📊 Dataset Requirements
+##  Development & Customization
+
+##  Dataset Requirements
 
 The application expects the enhanced dataset (`assignment3_II.csv`) with the following columns:
 - `Clothing ID`: Unique product identifier
@@ -71,252 +71,89 @@ The application expects the enhanced dataset (`assignment3_II.csv`) with the fol
 - `Clothes Title`: Product name
 - `Clothes Description`: Product description
 
-## 🏗️ Architecture
 
-### Backend Structure
-```
-shopping_website/
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
-├── README.md             # This file
-├── templates/            # HTML templates
-│   ├── base.html        # Base template
-│   ├── home.html        # Homepage
-│   ├── search.html      # Search results
-│   ├── product.html     # Product details
-│   └── add_review.html  # Review form
-└── static/              # Static assets
-    └── style.css        # Enhanced CSS styles
-```
+### Architecture Documentation
+- **[Backend Architecture](BACKEND_ARCHITECTURE.md)**: Complete backend system documentation
+- **[Frontend Architecture](FRONTEND_ARCHITECTURE.md)**: Frontend design patterns and components
 
-### Key Components
 
-#### TextProcessor Class
-- NLTK-based text preprocessing
-- Tokenization, lemmatization, stopword removal
-- Fallback mechanisms for missing dependencies
 
-#### MLPredictor Class
-- Multiple ML model management
-- Ensemble prediction system
-- Enhanced error handling and fallbacks
-
-#### SearchEngine Class
-- Fuzzy search with intelligent matching
-- Category filtering
-- Performance optimization
-
-## 🤖 Machine Learning Features
-
-### Model Integration
-- **Bag-of-Words Model**: Primary text classification model
-- **Title + Structured Features**: Combined text and metadata model
-- **Ensemble Prediction**: Weighted combination of multiple models
-
-### Prediction Pipeline
-1. Text preprocessing using Milestone I pipeline
-2. Feature extraction (BoW, TF-IDF, structured features)
-3. Model prediction with confidence scoring
-4. Ensemble result calculation
-5. JSON response with detailed metrics
-
-### Fallback Strategy
-- Smart fallbacks when ML models fail to load
-- Rating-based simple predictions
-- Graceful error handling
-- User-friendly error messages
-
-## 🎨 UI/UX Features
-
-### Modern Design
-- Bootstrap 5.1.3 framework
-- Custom CSS with gradients and animations
-- Responsive mobile-first design
-- Professional color scheme
-
-### Interactive Elements
-- Real-time form validation
-- Dynamic star ratings
-- Live character counters
-- Smooth page transitions
-- Hover effects and animations
-
-### User Experience
-- Intuitive navigation
-- Clear visual hierarchy
-- Loading states and feedback
-- Error handling with helpful messages
-- Accessible design patterns
-
-## 🔧 Configuration
-
-### Environment Variables
-No environment variables required for basic operation.
-
-### Customization Options
-- Modify `ensemble_weights` in MLPredictor for different model combinations
-- Adjust search parameters in SearchEngine class
-- Customize UI colors in `static/style.css`
-- Configure Flask settings in `app.py`
-
-## 📱 API Endpoints
-
-### Core Routes
-- `GET /`: Homepage with featured products
-- `GET /search`: Product search with filters
-- `GET /product/<id>`: Product detail page
-- `GET /add_review/<id>`: Review form
-- `POST /submit_review`: Submit new review
-
-### API Endpoints
-- `POST /predict_recommendation`: ML prediction API
-- `GET /api/categories`: Category data API
-- `GET /health`: Health check endpoint
-
-### API Usage Example
+#### Advanced API Features
 ```javascript
+// Enhanced ML Prediction API
 fetch('/predict_recommendation', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-        title: "Great product",
-        text: "I love this item, fits perfectly",
+        title: "Great product quality",
+        text: "I love this item, fits perfectly and great value",
         rating: 5,
-        clothing_id: 1077
+        clothing_id: 1077,
+        division: "General",
+        department: "Tops", 
+        class_name: "Blouses"
     })
 })
 .then(response => response.json())
-.then(data => console.log(data));
+.then(data => {
+    // Returns ensemble prediction with confidence scores
+    console.log('Prediction:', data.prediction);
+    console.log('Confidence:', data.confidence);
+    console.log('Model Details:', data.model_predictions);
+});
 ```
 
-## 🔍 Search Features
+### Architecture Customization
+- **Service Configuration**: Modify services in `backend/services/` for custom business logic
+- **Route Management**: Add new blueprints in `backend/routes/` for additional functionality  
+- **ML Model Tuning**: Adjust `ensemble_weights` and model parameters in `ml_predictor.py`
+- **Search Optimization**: Configure search scoring and filters in `search_engine.py`
+- **UI Theming**: Customize design system in `static/style.css` with CSS variables
 
-### Fuzzy Search
-- Intelligent text matching
-- Typo tolerance
-- Partial word matching
-- Fashion-specific term variations
-
-### Category Filtering
-- Division-based filtering
-- Department categorization
-- Class-specific searches
-- Combined filter support
-
-### Search Performance
-- Optimized query processing
-- Pagination for large results
-- Caching for common searches
-- Real-time result updates
-
-## 📈 Performance Optimizations
-
-### Loading Performance
-- Lazy loading of ML models
-- Efficient dataset processing
-- Optimized template rendering
-- Compressed static assets
-
-### Runtime Performance
-- Cached search results
-- Efficient pagination
-- Minimal database queries
-- Smart fallback mechanisms
-
-## 🛠️ Development
-
-### Code Structure
-- Modular class-based architecture
-- Separation of concerns
-- Comprehensive error handling
-- Extensive inline documentation
-
-### Testing
-- Built-in health check endpoint
-- Error logging and monitoring
-- Graceful failure handling
-- Development debug mode
-
-### Deployment
-- Production-ready Flask configuration
-- Gunicorn WSGI server support
-- Static file serving
-- Environment-specific settings
-
-## 🎯 Future Enhancements
-
-### Planned Features
-- User authentication system
-- Shopping cart functionality
-- Order management
-- Advanced recommendation system
-- Real-time chat support
-
-### Technical Improvements
-- Database integration (PostgreSQL/MongoDB)
-- Redis caching layer
-- API rate limiting
-- Advanced analytics
-- A/B testing framework
-
-## 📚 Dependencies
-
-### Core Dependencies
-- **Flask 2.3.3**: Web framework
-- **pandas 2.0.3**: Data manipulation
-- **scikit-learn 1.3.0**: Machine learning
-- **nltk 3.8.1**: Natural language processing
-- **numpy 1.24.3**: Numerical computing
-
-### UI Dependencies
-- **Bootstrap 5.1.3**: CSS framework (CDN)
-- **Bootstrap Icons**: Icon library (CDN)
-- **jQuery 3.6.0**: JavaScript library (CDN)
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Dataset not found**
-   - Ensure `assignment3_II.csv` is in project directory or parent directory
-   - Check file permissions and path
-
-2. **ML models not loading**
-   - Install all required dependencies: `pip install -r requirements.txt`
-   - Check NLTK data downloads
-   - Verify dataset format
-
-3. **Search not working**
-   - Ensure dataset is loaded properly
-   - Check for data format issues
-   - Verify text preprocessing pipeline
-
-### Debug Mode
-Run with debug enabled for detailed error messages:
+### Development Workflow
 ```bash
+# Enable debug mode for development
+export FLASK_DEBUG=1  # Linux/Mac
+set FLASK_DEBUG=1     # Windows
+
+# Run with auto-reload
 python app.py
+
+# Monitor system health
+curl http://127.0.0.1:5002/health
+
+# Test ML predictions
+curl -X POST http://127.0.0.1:5002/predict_recommendation \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test","text":"Great product","rating":5}'
 ```
 
-## 📄 License
+### Adding New Features
+1. **Create service classes** in `backend/services/` for business logic
+2. **Add route handlers** in appropriate blueprint files (`backend/routes/`)  
+3. **Register blueprints** in `backend/app_factory.py`
+4. **Update templates** in `templates/` for UI components
+5. **Add configuration** in `backend/config/settings.py` if needed
 
-This project is developed for educational purposes as part of Milestone II coursework.
+##  Monitoring & Analytics
 
-## 🤝 Contributing
+### System Health Monitoring
+- **Real-time Status**: `/health` endpoint provides system status JSON
+- **ML Model Status**: Monitor model loading and prediction performance
+- **Search Performance**: Track search response times and accuracy
+- **Error Tracking**: Comprehensive error logging with stack traces
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+### Administrative Features
+- **Dashboard Analytics**: Comprehensive overview at `/admin`
+- **Category Statistics**: Real-time product distribution analysis  
+- **Review Analytics**: User engagement and recommendation patterns
+- **Performance Metrics**: Response times and system resource usage
 
-## 📞 Support
 
-For issues and questions:
-1. Check the troubleshooting section
-2. Review error logs in console
-3. Verify all dependencies are installed
-4. Check dataset format and location
+### Contribution 
 
----
+- **Nguyen Phuoc Minh Phuc**: 25%
+- **Nguyen Sinh Giap**: 25%
+- **Dong Duc Binh**: 25%
+- **Nguyen Vu Linh**: 25%
 
-**Enhanced Shopping Website** - Bringing AI-powered insights to online shopping! 🛍️✨
