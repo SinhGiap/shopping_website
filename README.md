@@ -1,5 +1,8 @@
 # Enhanced Shopping Website 
 
+### GIT LINK
+https://github.com/SinhGiap/shopping_website.git
+
 ### DEMO VIDEO ONEDRIVE LINK
  https://rmiteduau.sharepoint.com/:v:/s/ItNguyenSinhGiap/ETLNPrCLFWxKu2Rvv-fWO5cBgXkWV7DaJ2v_lJmEfShQWQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=WdenY1
 
